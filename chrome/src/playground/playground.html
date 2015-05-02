@@ -1,0 +1,36 @@
+<script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
+
+<script>
+
+var myFirebaseRef = new Firebase("https://glaring-fire-3108.firebaseio.com/");
+
+var usersRef = myFirebaseRef.child('users');
+var tasksRef = myFirebaseRef.child('tasks');
+var pingsRef = myFirebaseRef.child('pings');
+
+var userInfo = {
+	firstName: "Nathan",
+	lastName: "Gould"
+}
+
+var user = usersRef.set({"nathan,gould@gmail,com": userInfo});
+
+var task = tasksRef.push({
+	title: "New Task",
+	description: "New Description"
+});
+
+var ping = pingsRef.push({
+	task: task.key(),
+	pinger: "nathan,gould@gmail.com"
+});
+
+</script>
+
+Hello World
+
+<table>
+	<tr>
+
+	</tr>
+</table>
