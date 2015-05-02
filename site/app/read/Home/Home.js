@@ -17,6 +17,9 @@
         var item = Office.cast.item.toItemRead(Office.context.mailbox.item);
         $('#subject').text(item.subject);
 
+        alert('hello');
+        alert(item.subject);
+
         var from;
         if (item.itemType === Office.MailboxEnums.ItemType.Message) {
             from = Office.cast.item.toMessageRead(item).from;
