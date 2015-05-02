@@ -1,6 +1,6 @@
 Firebase.enableLogging(true);
 
-var myFirebaseRef = new Firebase("https://glaring-fire-3108.firebaseio.com/");
+var myFirebaseRef = new Firebase("https://pingbox.firebaseio.com/");
 
 usersRef = myFirebaseRef.child('users')
 
