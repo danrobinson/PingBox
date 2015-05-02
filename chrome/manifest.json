@@ -1,11 +1,9 @@
 {
-  "name": "Firebase Sample Extension",
+  "name": "PingBox",
   "version": "0.0.1",
   "manifest_version": 2,
-  "description": "Firebase Sample extension.",
-  "homepage_url": "https://github.com/firebase/firebase-chrome-extension",
-  /* This sample uses firebaseio-demo.com but for production apps using a firebaseio.com Firebase, you won't need that. */
-  "content_security_policy": "script-src 'self' https://cdn.firebase.com https://*.firebaseio.com https://*.firebaseio-demo.com; object-src 'self'",
+  "description": "PingBox Chrome Extension",
+  "homepage_url": "https://github.com/danrobinson/PingBox",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
