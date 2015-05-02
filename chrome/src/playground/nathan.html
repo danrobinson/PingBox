@@ -1,0 +1,34 @@
+<html>
+
+<script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
+
+<script>
+
+//https://fiery-fire-379.firebaseio.com/
+
+var rootRef = new Firebase('https://docs-examples.firebaseio.com/web/data');
+
+var ref = new Firebase("https://docs-examples.firebaseio.com/web/saving-data/fireblog");
+
+var usersRef = ref.child("users");
+usersRef.set({
+    alanisaweseome: {
+        date_of_birth: "June 23rd, 1912",
+        full_name: "Alan Turing"
+    },
+    gracehop: {
+        date_of_birth: "December 9, 1906",
+        full_name: "Grace Hopper"
+    }
+});
+
+
+</script>
+
+<body>
+
+
+
+</body>
+
+</html>
