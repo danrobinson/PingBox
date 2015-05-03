@@ -13,30 +13,18 @@ Parse.Cloud.define("assignTask", function(request, response) {
   var task = new Task();
   task.set("title", request.params.title);
   task.set("description", request.params.description);
-  task.set("email", request.params.email);
+  task.set("assignee", request.params.assignee);
   task.set("score", 0);
   task.set("creator", request.user);
 
-  // Set assignee
-  var assigneeEmail = request.params.assignee;
-  var assigneeQuery = new Parse.Query("_User");
-  assigneeQuery.equalTo('email', assigneeEmail);
-  assigneeQuery.find({
-    success: function(results) {
-      task.set("assignee", results[0]);
-      task.save({
-        success: function(result) {
-          response.success({
-            task: task
-          });
-        },
-        error: function(error) {
-          response.error(error);
-        }
+  task.save({
+    success: function(result) {
+      response.success({
+        task: task
       });
     },
     error: function(error) {
-      response.error("No user found matching assignee.");
+      response.error(error);
     }
   });
 });

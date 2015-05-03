@@ -47,6 +47,104 @@
     #other-button.active a:hover {
         background-color: #22b24c;
     }
+
+    .panel-login {
+      border-color: #ccc;
+      -webkit-box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.2);
+      -moz-box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.2);
+      box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.2);
+    }
+    .panel-login>.panel-heading {
+      color: #00415d;
+      background-color: #fff;
+      border-color: #fff;
+      text-align:center;
+    }
+    .panel-login>.panel-heading a{
+      text-decoration: none;
+      color: #666;
+      font-weight: bold;
+      font-size: 15px;
+      -webkit-transition: all 0.1s linear;
+      -moz-transition: all 0.1s linear;
+      transition: all 0.1s linear;
+    }
+    .panel-login>.panel-heading a.active{
+      color: #029f5b;
+      font-size: 18px;
+    }
+    .panel-login>.panel-heading hr{
+      margin-top: 10px;
+      margin-bottom: 0px;
+      clear: both;
+      border: 0;
+      height: 1px;
+      background-image: -webkit-linear-gradient(left,rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.15),rgba(0, 0, 0, 0));
+      background-image: -moz-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.15),rgba(0,0,0,0));
+      background-image: -ms-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.15),rgba(0,0,0,0));
+      background-image: -o-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.15),rgba(0,0,0,0));
+    }
+    .panel-login input[type="text"],.panel-login input[type="email"],.panel-login input[type="password"] {
+      height: 45px;
+      border: 1px solid #ddd;
+      font-size: 16px;
+      -webkit-transition: all 0.1s linear;
+      -moz-transition: all 0.1s linear;
+      transition: all 0.1s linear;
+    }
+    .panel-login input:hover,
+    .panel-login input:focus {
+      outline:none;
+      -webkit-box-shadow: none;
+      -moz-box-shadow: none;
+      box-shadow: none;
+      border-color: #ccc;
+    }
+    .btn-login {
+      background-color: #59B2E0;
+      outline: none;
+      color: #fff;
+      font-size: 14px;
+      height: auto;
+      font-weight: normal;
+      padding: 14px 0;
+      text-transform: uppercase;
+      border-color: #59B2E6;
+    }
+    .btn-login:hover,
+    .btn-login:focus {
+      color: #fff;
+      background-color: #53A3CD;
+      border-color: #53A3CD;
+    }
+    .forgot-password {
+      text-decoration: underline;
+      color: #888;
+    }
+    .forgot-password:hover,
+    .forgot-password:focus {
+      text-decoration: underline;
+      color: #666;
+    }
+
+    .btn-register {
+      background-color: #1CB94E;
+      outline: none;
+      color: #fff;
+      font-size: 14px;
+      height: auto;
+      font-weight: normal;
+      padding: 14px 0;
+      text-transform: uppercase;
+      border-color: #1CB94A;
+    }
+    .btn-register:hover,
+    .btn-register:focus {
+      color: #fff;
+      background-color: #1CA347;
+      border-color: #1CA347;
+    }
+
     </style>
 
     <script>
@@ -59,15 +157,6 @@
 
     // set up Parse
     Parse.initialize("8fhsO5d7WTt6c7ffpVrPpHTVvuAi6vArrciyt8cK", "1GHMsEbKTKr7ZhLqcJUPcOJdi7CLD1YZeT4hGuEv");
-
-    Parse.User.logIn("DavidRobinson", "david", {
-      success: function(user) {
-        console.log("Login successful")
-      },
-      error: function(user, error) {
-        console.log("Login error: ", error)
-      }
-    });
 
     (function() {
       "use strict";
@@ -88,7 +177,7 @@
       var TaskClass = pingApp.TaskClass = Parse.Object.extend("Task", {
         isMine: function() {
           var user = Parse.User.current();
-          return (this.get("assignee").id == user.id);
+          return (this.get("assignee")== user.get("email"));
         },
 
         ping: function() {
@@ -113,7 +202,7 @@
 
       var TaskCollection = Parse.Collection.extend({
         model: TaskClass,
-        query: new Parse.Query("Task").descending("score")
+        query: new Parse.Query("Task").descending("score").include("creator")
       });
 
       var tasks = pingApp.tasks = new TaskCollection;
@@ -147,11 +236,11 @@
           }, this);
         },
 
-        componentWillUnmount: function () {
+        /* componentWillUnmount: function () {
           this.getCollections().forEach(function (collection) {
             collection.off(null, null, this);
           }, this);
-        }
+        }*/
       };
 
       var PingButton = React.createClass({
@@ -164,55 +253,134 @@
       });
 
       var LoginView = React.createClass({
+        mixins: [React.addons.LinkedStateMixin],
 
-        facebookLogIn: function() {
-          Parse.FacebookUtils.init({
-            appId      : '438605306303003',
-            xfbml      : true,
-            version    : 'v2.3'
-          });
-          
-          Parse.FacebookUtils.logIn(null, {
-              success: function(user) {
-                  if (!user.existed()) {
-                      console.log("!");
-                  } else {
-                      console.log("User logged in through Facebook!");
-                      location.reload();
-                  }
-              },
-              error: function(user, error) {
-                  console.log("User cancelled the Facebook login or did not fully authorize.");
-              }
+        getInitialState: function() {
+          return {
+            "login.email": "",
+            "login.password": "",
+            "signup.email": "",
+            "signup.password": "",
+          }
+        },
+
+        handleLogin: function() {
+          var main = this.props.main;
+          Parse.User.logIn(this.state["login.email"], this.state["login.password"], {
+            success: function(user) {
+              console.log(user);
+              main.forceUpdate();
+            },
+            error: function(user, error) {
+              alert("Login error: " + error.message);
+            }
           });
         },
 
-        render: function() {
-            var noneStyle = {display:"none"}
-            return (
-              <div>
-                <header id="header"></header>
-                <div className="login">
-                  <form className="login-form">
-                    <h2>Log In</h2>
-                    <div className="error" style={noneStyle}></div>
-                    <input type="text" id="login-username" placeholder="Username" />
-                    <input type="password" id="login-password" placeholder="Password" />
-                    <button>Log In</button>
-                  </form>
+        handleSignup: function() {
+          var user = new Parse.User();
+          user.set("username", this.state["signup.email"]);
+          user.set("password", this.state["signup.password"]);
+          var main = this.props.main;
+          console.log(main);
+          user.signUp(null, {
+            success: function(user) {
+              console.log(user);
+              main.forceUpdate();
+            },
+            error: function(user, error) {
+              // Show the error message somewhere and let the user try again.
+              alert("Signup error: " + error.message);
+            }
+          });
+        },
 
-                  <form className="signup-form">
-                    <h2>Sign Up</h2>
-                    <div className="error" style={noneStyle}></div>
-                    <input type="text" id="signup-username" placeholder="Username" />
-                    <input type="password" id="signup-password" placeholder="Create a Password" />
-                    <button>Sign Up</button>
-                  </form>
+        componentDidMount: function() {
+              $('#login-form-link').click(function(e) {
+              $("#login-form").delay(100).fadeIn(100);
+              $("#register-form").fadeOut(100);
+              $('#register-form-link').removeClass('active');
+              $(this).addClass('active');
+              e.preventDefault();
+            });
+            $('#register-form-link').click(function(e) {
+              $("#register-form").delay(100).fadeIn(100);
+              $("#login-form").fadeOut(100);
+              $('#login-form-link').removeClass('active');
+              $(this).addClass('active');
+              e.preventDefault();
+          });
+            var handleSignup = this.handleSignup;
+            var handleLogin = this.handleLogin;
+            $('#login-form').submit(function(e) {
+              e.preventDefault();
+              handleLogin();
+            })
+            $('#register-form').submit(function(e) {
+              e.preventDefault();
+              handleSignup();
+            })
+        },
+
+        render: function() {
+          return (
+
+            <div className="container">
+              <div className="row">
+                <div className="col-md-6 col-md-offset-3">
+                  <div className="panel panel-login">
+                    <div className="panel-heading">
+                      <div className="row">
+                        <div className="col-xs-6">
+                          <a href="#" className="active" id="login-form-link">Login</a>
+                        </div>
+                        <div className="col-xs-6">
+                          <a href="#" id="register-form-link">Register</a>
+                        </div>
+                      </div>
+                      <hr />
+                    </div>
+                    <div className="panel-body">
+                      <div className="row">
+                        <div className="col-lg-12">
+                          <form id="login-form" style={{display: 'block'}}>
+                            <div className="form-group">
+                              <input type="email" name="email" id="email" tabIndex={1} className="form-control" valueLink={this.linkState('login.email')} placeholder="Email Address" />
+                            </div>
+                            <div className="form-group">
+                              <input type="password" name="password" action="post" id="password" tabIndex={2} className="form-control" valueLink={this.linkState('login.password')} placeholder="Password" />
+                            </div>
+                            <div className="form-group">
+                              <div className="row">
+                                <div className="col-sm-6 col-sm-offset-3">
+                                  <input type="submit" name="login-submit" id="login-submit" tabIndex={3} className="form-control btn btn-login" />
+                                </div>
+                              </div>
+                            </div>
+                          </form>
+                          <form id="register-form" role="form" action="post" style={{display: 'none'}}>
+                            <div className="form-group">
+                              <input type="email" name="email" id="email" tabIndex={1} className="form-control" valueLink={this.linkState('signup.email')} placeholder="Email Address" />
+                            </div>
+                            <div className="form-group">
+                              <input type="password" name="password" id="password" tabIndex={2} className="form-control" valueLink={this.linkState('signup.password')} placeholder="Password" />
+                            </div>
+                            <div className="form-group">
+                              <div className="row">
+                                <div className="col-sm-6 col-sm-offset-3">
+                                  <input type="submit" name="register-submit" id="register-submit" tabIndex={4} className="form-control btn btn-register" defaultValue="Register Now" />
+                                </div>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                
-                <button onclick={this.facebookLogIn}>Log In Through Facebook</button>
               </div>
-            )
+            </div>
+          );
         }
       });
 
@@ -231,6 +399,8 @@
           console.log("handling");
           e.preventDefault();
           console.log(this.state);
+          var assignt = this;
+          assignt.setState(assignt.getInitialState());
           Parse.Cloud.run("assignTask", {
             title: this.state.title,
             assignee: this.state.assignee,
@@ -238,9 +408,8 @@
           }, {
             success: function(result) {
               console.log(result);
-              this.setState(this.getInitialState());
             }
-          })
+          });
         },
       
         render: function() {
@@ -264,7 +433,27 @@
       });
 
       var NavBar = React.createClass({
+        logout: function(e) {
+          e.preventDefault();
+          var main = this.props.main;
+          console.log(main);
+          main.forceUpdate();
+          Parse.User.logOut(function() {
+            success: {
+              console.log("logging out");
+              main.forceUpdate();
+            }
+          });
+        },
+
         render: function() {
+          var logoutButton;
+          var user = Parse.User.current()
+          if (user) {
+            logoutButton = <li><a href="#" onClick={this.logout}>Logout</a></li>
+          } else {
+            logoutButton = null;
+          }
           return (
             <nav className="navbar navbar-inverse">
               <div className="container-fluid">
@@ -277,12 +466,12 @@
                   </button>
                   <a className="navbar-brand" href="#">PingBox</a>
                 </div>
-
                 <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                   <ul className="nav navbar-nav">
                     <li className="active"><a href="#">App <span className="sr-only">(current)</span></a></li>
                   </ul>
                   <ul className="nav navbar-nav navbar-right">
+                    {logoutButton}
                   </ul>
                 </div>
               </div>
@@ -323,6 +512,8 @@
 
         render: function() {
           var task = this.props.task;
+          var creator_email = task.get('creator').get('email');
+          var assignee_email = task.get("assignee");
           var buttonClass = (task.pinged ? "deactive " : "") + "glyphicon " + (task.isMine() ? "glyphicon-ok-sign" : "glyphicon-circle-arrow-up") + " ping-button"
           return (
             <div onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onClick={this.handleClick} className="list-group-item" style={{"backgroundColor": this.state.mouseOver ? "#d3d3d3" : "white"}}>
@@ -331,9 +522,9 @@
                 {task.get("title")}
                 {!task.isMine() ? <PingButton task={task} handleClick={task.isMine() ? this.handleCheck : this.handlePing} /> : null }
               </h4>
-              <div className="details"> 
-                <div><b>Requester:</b> <a href="#">{task.get("requester")}</a></div>
-                {!task.isMine() ? <div><b>Assignee</b>: <a href="#">{task.get("assignee").email}</a></div> : null}
+              <div className="details">
+                <div><b>Requester:</b> <a href={"mailto:" + creator_email}>{creator_email}</a></div>
+                {!task.isMine() ? <div><b>Assignee:</b> <a href={"mailto:" + assignee_email}>{assignee_email}</a></div> : null}
                 <div><b>Description:</b> {task.get("description")}</div>
               </div>
             </div>
@@ -342,9 +533,36 @@
       });
 
       var MainPage = React.createClass({
+
+        render: function() {
+          var currentUser = Parse.User.current();
+          var content;
+          var main = this;
+          if (currentUser) {
+            content = <PingBox tasks={this.props.tasks} main={main} />
+          } else {
+            content = <LoginView main={main} />
+          }
+          return (
+            <OutlinePage content={content} main={main} />
+          )
+        }
+      });
+
+      var OutlinePage = React.createClass({
+        render: function() {
+          return (<div>
+            <NavBar main={this.props.main} />
+            {this.props.content}
+            </div>
+          )
+        }
+      })
+
+      var PingBox = React.createClass({
         mixins: [CollectionMixin],
 
-        getCollections: function () {
+        getCollections: function() {
           return [this.props.tasks];
         },
 
@@ -369,7 +587,19 @@
         },
 
         render: function() {
+          var nothing = true;
+          var yourTasks = tasks.map(function(task){
+            if (task.isMine()) {
+              nothing = false;
+              return (<TaskRow task={task} key={task.id} />)                      
+            }
+          });
+          if (nothing) {
+            yourTasks = <h4 style={{margin:"20px"}}>You don't have anything to do yet.</h4>
+          }
+          console.log(yourTasks.length);
           return (
+            <div className="container">
             <div className="row">
               <div className="col-md-8">
                 <ul className="nav nav-pills">
@@ -378,13 +608,8 @@
                 </ul>
                 <div className="list-group panel panel-primary" id="for-me">
                   <a href="#" className="list-group-item active task-list-header"> {/* panel-heading ? */}
-                    {/* Tasks For You To Do */}
                   </a>
-                  {tasks.map(function(task){
-                    if (task.isMine()) {
-                      return (<TaskRow task={task} key={task.id} />)                      
-                    }
-                  })}
+                  {yourTasks}
                 </div>
                 <div className="list-group panel panel-success" id="for-others">
                   <div href="#" id="other-panel" className="list-group-item active panel-heading task-list-header">
@@ -418,16 +643,12 @@
                 </div>
               </div>
             </div>
+            </div>
           );
         }
       });
 
       // Render Components
-
-      pingApp.navBar = React.render(
-        <NavBar />,
-        $("#navbar")[0]
-      );
 
       pingApp.mainPage = React.render(
         <MainPage tasks={tasks}/>,
@@ -441,10 +662,6 @@
   </head>
 
   <body>
-
-    <div id="navbar"></div>
-
-        <div id="main" class="container">
-          </div>
+    <div id="main" class="container"></div>
     </body>
 </html>
