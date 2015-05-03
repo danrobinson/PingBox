@@ -7,8 +7,8 @@ $(function() {
   Parse.$ = jQuery;
 
   // Initialize Parse with your Parse application javascript keys
-  Parse.initialize("8fhsO5d7WTt6c7ffpVrPpHTVvuAi6vArrciyt8cK",
-                   "1GHMsEbKTKr7ZhLqcJUPcOJdi7CLD1YZeT4hGuEv");
+    Parse.initialize("8fhsO5d7WTt6c7ffpVrPpHTVvuAi6vArrciyt8cK", 
+      "1GHMsEbKTKr7ZhLqcJUPcOJdi7CLD1YZeT4hGuEv");
 
   // Todo Model
   // ----------
@@ -212,7 +212,6 @@ $(function() {
 
       this.delegateEvents();
 
-      this.allCheckbox.checked = !remaining;
     },
 
     // Filters the list based on which type of filter is selected
