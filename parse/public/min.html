@@ -7,6 +7,9 @@
     <script src="http://www.parsecdn.com/js/parse-1.2.13.min.js"></script>
     <link rel="stylesheet" href="css/bootstrap.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.2/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.2/JSXTransformer.js"></script>
+
     <script src="js/parse.js"></script>
     <style type="text/css">
     .details, .add-task {
@@ -47,247 +50,401 @@
     </style>
 
     <script>
-    $(document).ready(function(){
-        $('.list-group-item:not(.upvote)').click(function(){
-          $(this).children('.details').slideToggle('fast');
-        });
+    </script>
 
-        $('#new-button').click(function (){ 
-          // $(this).children('.add-task').show();
-          $('.add-task').slideToggle('fast');
-        });
+    <script type="text/jsx">
 
-        $('.list-group-item:not(.task-list-header)').mouseover(function(){
-          $(this).css('background-color', '#d3d3d3');
-        });
-        $('.list-group-item:not(.task-list-header)').mouseout(function(){
-          $(this).css('background-color', 'white');
-        });
+    // set up global Parse app
+    var pingApp = pingApp || {};
 
-        // id="for-others"
-        $("#other-button").click(function() {
-          $("#for-others").slideDown(200);
-          $("#for-me").slideUp(200);
-          $("#other-button").addClass("active");
-          $("#me-button").removeClass("active");
-        })
-        $("#me-button").click(function() {
-          $("#for-me").slideDown(200);
-          $("#for-others").slideUp(200);
-          $("#other-button").removeClass("active");
-          $("#me-button").addClass("active");
-        })
+    // set up Parse
+    Parse.initialize("8fhsO5d7WTt6c7ffpVrPpHTVvuAi6vArrciyt8cK", "1GHMsEbKTKr7ZhLqcJUPcOJdi7CLD1YZeT4hGuEv");
 
+    /*
+
+    Parse.User.logIn("DavidRobinson", "david", {
+      success: function(user) {
+        console.log("Login successful")
+      },
+      error: function(user, error) {
+        console.log("Login error: ", error)
+      }
     });
+
+    */
+
+    (function() {
+      "use strict";
+
+      // Collections
+
+      var currentUser = Parse.User.current();
+
+      var PingClass = Parse.Object.extend("Ping", {});
+      
+      var PingCollection = Parse.Collection.extend({
+        model: PingClass,
+        fetch: function(options) {
+          var collection = this;
+          Parse.Cloud.run('todayPings', {
+            success: function(results) {
+              collection.reset(results, options);
+            }, error: function(error) {
+              console.log(error);
+            }
+          }
+        )}
+        /* query: new Parse.Query("Ping")
+          .equalTo("creator", currentUser)
+          .greaterThan("createdAt", midnight),*/
+      });
+
+      var pings = pingApp.pings = new PingCollection;
+      pings.fetch();
+
+      var TaskClass = Parse.Object.extend("Task", {
+        isMine: function() {
+          var user = Parse.User.current();
+          return (this.get("assignee").id == user.id);
+        },
+
+        ping: function() {
+          this.pinged = true;
+          this.increment("score");
+          var thisTask = this;
+          Parse.Cloud.run('ping', {taskId: this.id}, {
+            success: function(result) {
+              // update object
+              pings.add(result.ping);
+              console.log(pings.all())
+              console.log(result);
+              thisTask.set(result.task.attributes);
+            },
+            error: function(result) {
+              // reverse changes
+              console.log(result);
+              thisTask.increment("score", -1);
+            }
+          });
+        }
+      });
+
+      var TaskCollection = Parse.Collection.extend({
+        model: TaskClass,
+        query: new Parse.Query("Task")
+      });
+
+      var tasks = pingApp.tasks = new TaskCollection;
+      tasks.on('add remove change sync', function(collection) {console.log("Task Event: ", collection)})
+      tasks.fetch();
+
+      // Components
+
+      var CollectionMixin = {
+        componentDidMount: function () {
+          // Whenever there may be a change in the data, trigger a
+          // reconcile.
+          this.getCollections().forEach(function (collection) {
+            collection.on('add remove change sync', this.forceUpdate.bind(this, null));
+          }, this);
+        },
+
+        componentWillUnmount: function () {
+          this.getCollections().forEach(function (collection) {
+            collection.off(null, null, this);
+          }, this);
+        }
+      };
+
+      var PingButton = React.createClass({
+        render: function() {
+            var buttonClass = (this.props.task.pinged ? "deactive-upvote " : "") + "glyphicon " + (this.props.task.isMine() ? "glyphicon-ok-sign" : "glyphicon-circle-arrow-up") + " ping-button";
+            return <a href="#"><span style={{fontSize: 26}} onClick={this.props.handleClick} className={buttonClass} aria-hidden="true" align="right" /></a>
+        }
+      });
+
+      var PingTaskRow = React.createClass({
+
+        render: function() {
+          var task = this.props.task;
+          return (
+            <tr>
+              <td>{task.get("score")}</td>
+              <td>{task.get("title")}</td>
+              <td>{task.get("assignee")}</td>
+              <td><PingButton task={task} handlePing={this.handlePing} /></td>
+            </tr>
+          )
+        }
+      });
+
+      var LoginView = React.createClass({
+
+        facebookLogIn: function() {
+          Parse.FacebookUtils.init({
+            appId      : '438605306303003',
+            xfbml      : true,
+            version    : 'v2.3'
+          });
+          
+          Parse.FacebookUtils.logIn(null, {
+              success: function(user) {
+                  if (!user.existed()) {
+                      console.log("!");
+                  } else {
+                      console.log("User logged in through Facebook!");
+                      location.reload();
+                  }
+              },
+              error: function(user, error) {
+                  console.log("User cancelled the Facebook login or did not fully authorize.");
+              }
+          });
+        },
+
+        render: function() {
+            var noneStyle = {display:"none"}
+            return (
+              <div>
+                <header id="header"></header>
+                <div className="login">
+                  <form className="login-form">
+                    <h2>Log In</h2>
+                    <div className="error" style={noneStyle}></div>
+                    <input type="text" id="login-username" placeholder="Username" />
+                    <input type="password" id="login-password" placeholder="Password" />
+                    <button>Log In</button>
+                  </form>
+
+                  <form className="signup-form">
+                    <h2>Sign Up</h2>
+                    <div className="error" style={noneStyle}></div>
+                    <input type="text" id="signup-username" placeholder="Username" />
+                    <input type="password" id="signup-password" placeholder="Create a Password" />
+                    <button>Sign Up</button>
+                  </form>
+                </div>
+                
+                <button onclick={this.facebookLogIn}>Log In Through Facebook</button>
+              </div>
+            )
+        }
+      });
+
+      var AssignTask = React.createClass({
+        render: function() {
+          return (
+            <div className="add-task">
+              <form>
+                <div className="form-group">
+                  <label id="tasktitlelabel" htmlFor="task-title-label">Task Title:</label>
+                  {/* TODO(cjr): is it okay that type is email? */}
+                  <input type="text" className="form-control" id="tasktitle" placeholder="Task title goes here." />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="assigner">Assignee:</label>
+                  <input type="email" className="form-control" id="taskassigner" placeholder="EMAIL ADDRESS" />
+                </div>
+                <div className="form-group" id="taskwatchers">
+                  <label htmlFor="watchlist">Watch list:</label>
+                  <input type="email" className="form-control" id="taskwatch0" placeholder="EMAIL ADDRESS" />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="description">Description:</label>
+                  <textarea className="form-control" id="taskdesc" placeholder="Task description" maxLength={300} />
+                </div>
+                <button type="submit" className="btn btn-default">Submit</button>
+              </form>
+            </div>
+          );
+        }
+      });
+
+      var NavBar = React.createClass({
+        render: function() {
+          return (
+            <nav className="navbar navbar-inverse">
+              <div className="container-fluid">
+                <div className="navbar-header">
+                  <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                    <span className="sr-only">Toggle navigation</span>
+                    <span className="icon-bar"></span>
+                    <span className="icon-bar"></span>
+                    <span className="icon-bar"></span>
+                  </button>
+                  <a className="navbar-brand" href="#">PingBox</a>
+                </div>
+
+                <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                  <ul className="nav navbar-nav">
+                    <li className="active"><a href="#">App <span className="sr-only">(current)</span></a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Help</a></li>
+                  </ul>
+                  <ul className="nav navbar-nav navbar-right">
+                    <li><a href="#">Sign in or out or whatever, who cares.</a></li>
+                  </ul>
+                </div>
+              </div>
+            </nav>
+          )
+        }
+      });
+
+      var TaskRow = React.createClass({
+
+        getInitialState: function() {
+          return {"mouseOver": false}
+        },
+
+        handleClick: function(event) {
+          var el = React.findDOMNode(this);
+          $(el).children('.details').slideToggle('fast');
+        },
+
+        handlePing: function(event) {
+          event.stopPropagation();
+          this.props.task.ping();
+        },
+
+        handleCheck: function(event) {
+          event.stopPropagation();
+        },
+
+        handleMouseEnter: function() {
+          this.setState({"mouseOver": true})
+        },
+
+        handleMouseLeave: function() {
+          this.setState({"mouseOver": false})
+        },
+
+        render: function() {
+          var task = this.props.task;
+          var buttonClass = (task.pinged ? "deactive-upvote " : "") + "glyphicon " + (task.isMine() ? "glyphicon-ok-sign" : "glyphicon-circle-arrow-up") + " ping-button"
+          return (
+            <div onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onClick={this.handleClick} className="list-group-item" style={{"backgroundColor": this.state.mouseOver ? "#d3d3d3" : "white"}}>
+              <span className="badge"><div style={{fontSize: 19}}>{task.get("score")}</div></span>
+              <h4 className="list-group-item-heading">
+                {task.get("title")}
+                <PingButton task={task} handleClick={task.isMine() ? this.handleCheck : this.handlePing} />
+              </h4>
+              <div className="details"> 
+                <div><b>Requester:</b> <a href="#">{task.get("requester")}</a></div>
+                {!task.isMine() ? <div><b>Assignee</b>: <a href="#">{task.get("assignee")}</a></div> : null}
+                <div><b>Watchers:</b> 
+                </div>
+                <div><b>Description:</b> {task.get("description")}</div>
+              </div>
+            </div>
+          )
+        }
+      });
+
+      var MainPage = React.createClass({
+        mixins: [CollectionMixin],
+
+        getCollections: function () {
+          return [this.props.tasks];
+        },
+
+        componentDidMount: function() {
+              // id="for-others"
+              $("#other-button").click(function() {
+                $("#for-others").slideDown(200);
+                $("#for-me").slideUp(200);
+                $("#other-button").addClass("active");
+                $("#me-button").removeClass("active");
+              })
+              $("#me-button").click(function() {
+                $("#for-me").slideDown(200);
+                $("#for-others").slideUp(200);
+                $("#other-button").removeClass("active");
+                $("#me-button").addClass("active");
+            });
+        },
+
+        newButton: function() {
+          $('.add-task').slideToggle('fast');
+        },
+
+        render: function() {
+          return (
+            <div className="row">
+              <div className="col-md-8">
+                <ul className="nav nav-pills">
+                  <li id="me-button" className="active"><a><h3>What People Need From Me</h3></a></li>
+                  <li id="other-button"><a><h3>What I Need From People</h3></a></li>
+                </ul>
+                <div className="list-group panel panel-primary" id="for-me">
+                  <a href="#" className="list-group-item active task-list-header"> {/* panel-heading ? */}
+                    {/* Tasks For You To Do */}
+                  </a>
+                  {tasks.map(function(task){
+                    if (task.isMine()) {
+                      return (<TaskRow task={task} key={task.id} />)                      
+                    }
+                  })}
+                </div>
+                <div className="list-group panel panel-success" id="for-others">
+                  <div href="#" id="other-panel" className="list-group-item active panel-heading task-list-header">
+                    <h4>Tell Someone You Need Something
+                      <span style={{fontSize: 26}} id="new-button" onClick={this.newButton} className="glyphicon glyphicon-plus-sign ping-button" aria-hidden="true" align="right" />
+                    </h4>
+                  </div>
+                  <AssignTask />
+                  {tasks.map(function(task){
+                    if (!task.isMine()) {
+                      return (<TaskRow task={task} key={task.id} />)                      
+                    }
+                  })}
+                </div>
+                <div className="modal">
+                  <div className="modal-dialog">
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <button type="button" className="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 className="modal-title">Modal title</h4>
+                      </div>
+                      <div className="modal-body">
+                        <p>One fine body…</p>
+                      </div>
+                      <div className="modal-footer">
+                        <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" className="btn btn-primary">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+      });
+
+      // Render Components
+
+      pingApp.navBar = React.render(
+        <NavBar />,
+        $("#navbar")[0]
+      );
+
+      pingApp.mainPage = React.render(
+        <MainPage tasks={tasks}/>,
+        $("#main")[0]
+      );
+
+    })();
+
     </script>
 
   </head>
 
   <body>
 
-    <nav class="navbar navbar-inverse">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">PingBox</a>
-        </div>
+    <div id="navbar"></div>
 
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="#">App <span class="sr-only">(current)</span></a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Help</a></li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">Sign in or out or whatever. I don't care.</a></li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-          <div class="container">
-          <div class="row">
-
-            <div class="col-md-8">
-              <ul class="nav nav-pills">
-                <li id="me-button" class="active"><a><h3>What People Need From Me</h3></a></li>
-                <li id="other-button"><a><h3>What I Need From People</h3></a></li>
-              </ul>
-
-              <div class="list-group panel panel-primary" id="for-me">
-                <a href="#" class="list-group-item active task-list-header"> <!-- panel-heading ? -->
-                  <!-- Tasks For You To Do -->
-                </a>
-                <div class="list-group-item">
-                  <span class="badge"><div style="font-size:19px">5</div></span>
-                  <h4 class="list-group-item-heading">
-                    Ride the banana boat
-                    <a href="#">
-                      <span style="font-size:26px" class="glyphicon glyphicon-ok-sign ping-button" aria-hidden="true" align="right"></span></a>
-                  </h4>
-                  <div class="details"> 
-                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
-                      <div><b>Watchers:</b> <a href="#">...</a></div>
-                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
-                  </div>
-                </div>
-                <div class="list-group-item">
-                  <span class="badge"><div style="font-size:19px">3</div></span>
-                  <h4 class="list-group-item-heading">
-                    <a href="#">
-                      <span style="font-size:26px" class="glyphicon glyphicon-ok-sign ping-button" aria-hidden="true" align="right"></span></a>
-                    Tame the white dragon.
-                  </h4>
-                  <div class="details"> 
-                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
-                      <div><b>Watchers:</b> <a href="#">...</a></div>
-                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
-                  </div>
-                </div>
-                <div class="list-group-item">
-                  <span class="badge"><div style="font-size:19px">2</div></span>
-                  <h4 class="list-group-item-heading">
-                    <a href="#">
-                      <span style="font-size:26px" class="glyphicon glyphicon-ok-sign ping-button" aria-hidden="true" align="right"></span></a>
-                    Take a jog down the dusty road.
-                  </h4>
-                  <div class="details"> 
-                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
-                      <div><b>Watchers:</b> <a href="#">...</a></div>
-                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
-                  </div>
-                </div>
-                
-                <div href="#" class="list-group-item"><hr></div>
-
-                <div class="list-group-item">
-                  <span class="badge">1</span>
-                  <h4 class="list-group-item-heading">
-                    <a href="#">
-                      <span class="glyphicon glyphicon-ok-sign ping-button" aria-hidden="true" align="right"></span></a>
-                    Brush your teeth
-                  </h4>
-                  <div class="details"> 
-                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
-                      <div><b>Watchers:</b> <a href="#">...</a></div>
-                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="list-group panel panel-success" id="for-others">
-                <div href="#" id="other-panel" class="list-group-item active panel-heading task-list-header">
-                  <h4>Tell Someone You Need Something
-                      <span style="font-size:26px" id="new-button" class="glyphicon glyphicon-plus-sign ping-button" aria-hidden="true" align="right"></span>
-                      </h4>
-                      <div class="add-task">
-                        <form>
-                        <div class="form-group">
-                            <label id="tasktitlelabel" for="task-title-label">Task Title:</label>
-                            <!-- TODO(cjr): is it okay that type is email? -->
-                            <input type="text" class="form-control" id="tasktitle" placeholder="Task title goes here.">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="assigner">Assignee:</label>
-                            <input type="email" class="form-control" id="taskassigner" placeholder="EMAIL ADDRESS">
-                        </div>
-
-                        <div class="form-group" id="taskwatchers">
-                            <label for="watchlist">Watch list:</label>
-                            <input type="email" class="form-control" id="taskwatch0" placeholder="EMAIL ADDRESS">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="description">Description:</label>
-                            <textarea class="form-control" id="taskdesc" placeholder="Task description" maxlength="300"></textarea>
-                        </div>
-
-                        <button type="submit" class="btn btn-default">Submit</button>
-                        </form>
-                      </div>
-                </div>
-                <div class="list-group-item">
-                  <span class="badge"><div style="font-size:19px">3</div></span>
-                  <h4 class="list-group-item-heading">
-                    Ride the other banana boat
-                      <span style="font-size:26px" class="glyphicon glyphicon-star ping-button" aria-hidden="true" align="right"></span>
-                  </h4>
-                  <div class="details"> 
-                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
-                      <div><b>Watchers:</b> <a href="#">...</a></div>
-                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
-                  </div>
-                </div>
-                <div class="list-group-item">
-                  <span class="badge"><div style="font-size:19px">3</div></span>
-                  <h4 class="list-group-item-heading">
-
-                    <a href="#">
-                      <span style="font-size:26px" class="upvote glyphicon glyphicon-circle-arrow-up ping-button" aria-hidden="true" align="right"></span></a>
-                    Tame the white dragon.
-                  </h4>
-                  <div class="details"> 
-                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
-                      <div><b>Watchers:</b> <a href="#">...</a></div>
-                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
-                  </div>
-                </div>
-                <div class="list-group-item">
-                  <span class="badge"><div style="font-size:19px">1</div></span>
-                  <h4 class="list-group-item-heading">
-                  <span style="font-size:26px" class="deactive-upvote glyphicon glyphicon-circle-arrow-up ping-button" aria-hidden="true" align="right"></span>
-                    Take a jog down the dusty road.
-                  </h4>
-                  <div class="details"> 
-                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
-                      <div><b>Watchers:</b> <a href="#">...</a></div>
-                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
-                  </div>
-                </div>
-                
-                <div href="#" class="list-group-item"><hr></div>
-
-                <div class="list-group-item">
-                  <span class="badge">1</span>
-                  <h4 class="list-group-item-heading">
-                    <a href="#">
-                      <span class="upvote glyphicon glyphicon-circle-arrow-up" aria-hidden="true" align="right"></span></a>
-                    Brush your teeth
-                  </h4>
-                  <div class="details"> 
-                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
-                      <div><b>Watchers:</b> <a href="#">...</a></div>
-                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="modal">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                      <h4 class="modal-title">Modal title</h4>
-                    </div>
-                    <div class="modal-body">
-                      <p>One fine body…</p>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                      <button type="button" class="btn btn-primary">Save changes</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-            </div>
+        <div id="main" class="container">
           </div>
     </body>
 </html>
