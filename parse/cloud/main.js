@@ -5,23 +5,14 @@ Parse.Cloud.define("hello", function(request, response) {
   response.success("Hello world!");
 });
 
-Parse.Cloud.beforeSave("Ping", function(request, response) {
-  request.object.set("creator", request.user);
-  //TODO: Increment score on task, etc.
-  response.success();
-});
-
 Parse.Cloud.define("assignTask", function(request, response) {
   if (request.user === null) {
     response.error("User not logged in.");
   }
-  //if (!request.object.id) {
-  //  request.object.set("score", 0);
-  //}
   var Task = Parse.Object.extend("Task");
   var task = new Task();
   task.set("title", request.params.title);
-  task.set("description", request.params.title);
+  task.set("description", request.params.description);
   task.set("email", request.params.email);
   task.set("score", 0);
   task.set("creator", request.user);
@@ -36,8 +27,29 @@ Parse.Cloud.define("assignTask", function(request, response) {
         response.error("No watchers signed up with PingBox.");
       } else {
         task.set("watchers", results);
-        task.save();
-        response.success();
+
+        // Set assignee
+        var assigneeEmail = request.params.assignee;
+        var assigneeQuery = new Parse.Query("_User");
+        assigneeQuery.equalTo('email', assigneeEmail);
+        assigneeQuery.find({
+          success: function(results) {
+            task.set("assignee", results[0]);
+            task.save({
+              success: function(result) {
+                response.success({
+                  task: task
+                });
+              },
+              error: function(error) {
+                response.error(error);
+              }
+            });
+          },
+          error: function(error) {
+            response.error("No user found matching assignee.");
+          }
+        });
       }
     },
     error: function() {
@@ -45,7 +57,6 @@ Parse.Cloud.define("assignTask", function(request, response) {
     }
   });
 });
-
 
 Parse.Cloud.define("ping", function(request, response) {
   if (request.user === null) {
@@ -69,9 +80,18 @@ Parse.Cloud.define("ping", function(request, response) {
         var ping = new Ping();
         ping.set("task", task);
         ping.set("creator", request.user);
-        ping.save();
+        ping.save({
+          success: function(result) {
+            response.success({
+              task: task,
+              ping: ping
+            });
+          },
+          error: function(error) {
+            response.error(error);
+          }
+        });
 
-        response.success();
       },
       error: function(error) {
         response.error("Task with that objectId not found");
