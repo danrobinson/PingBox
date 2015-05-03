@@ -21,7 +21,7 @@
       margin-right: 6px;
     }
 
-    .deactive-upvote {
+    .deactive {
       color: gray;
     }
 
@@ -84,19 +84,6 @@
       
       var PingCollection = Parse.Collection.extend({
         model: PingClass,
-        fetch: function(options) {
-          var collection = this;
-          Parse.Cloud.run('todayPings', {
-            success: function(results) {
-              collection.reset(results, options);
-            }, error: function(error) {
-              console.log(error);
-            }
-          }
-        )}
-        /* query: new Parse.Query("Ping")
-          .equalTo("creator", currentUser)
-          .greaterThan("createdAt", midnight),*/
       });
 
       var pings = pingApp.pings = new PingCollection;
@@ -109,6 +96,7 @@
         },
 
         ping: function() {
+          var oldPinged = this.pinged;
           this.pinged = true;
           this.increment("score");
           var thisTask = this;
@@ -116,13 +104,11 @@
             success: function(result) {
               // update object
               pings.add(result.ping);
-              console.log(pings.all())
-              console.log(result);
               thisTask.set(result.task.attributes);
             },
             error: function(result) {
               // reverse changes
-              console.log(result);
+              thisTask.pinged = oldPinged;
               thisTask.increment("score", -1);
             }
           });
@@ -158,23 +144,10 @@
 
       var PingButton = React.createClass({
         render: function() {
-            var buttonClass = (this.props.task.pinged ? "deactive-upvote " : "") + "glyphicon " + (this.props.task.isMine() ? "glyphicon-ok-sign" : "glyphicon-circle-arrow-up") + " ping-button";
-            return <a href="#"><span style={{fontSize: 26}} onClick={this.props.handleClick} className={buttonClass} aria-hidden="true" align="right" /></a>
-        }
-      });
-
-      var PingTaskRow = React.createClass({
-
-        render: function() {
-          var task = this.props.task;
-          return (
-            <tr>
-              <td>{task.get("score")}</td>
-              <td>{task.get("title")}</td>
-              <td>{task.get("assignee")}</td>
-              <td><PingButton task={task} handlePing={this.handlePing} /></td>
-            </tr>
-          )
+            var buttonClass = (this.props.task.pinged ? "deactive " : "") + "glyphicon " + (this.props.task.isMine() ? "glyphicon-ok-sign" : "glyphicon-circle-arrow-up") + " ping-button";
+            return (
+              this.props.task.pinged ? <span style={{fontSize: 26}} onClick={this.props.handleClick} className={buttonClass} aria-hidden="true" align="right" /> : <a href="#"><span style={{fontSize: 26}} onClick={this.props.handleClick} className={buttonClass} aria-hidden="true" align="right" /></a>
+              )
         }
       });
 
@@ -304,7 +277,9 @@
 
         handlePing: function(event) {
           event.stopPropagation();
-          this.props.task.ping();
+          if (!this.props.task.pinged) {
+            this.props.task.ping();            
+          }
         },
 
         handleCheck: function(event) {
@@ -321,7 +296,7 @@
 
         render: function() {
           var task = this.props.task;
-          var buttonClass = (task.pinged ? "deactive-upvote " : "") + "glyphicon " + (task.isMine() ? "glyphicon-ok-sign" : "glyphicon-circle-arrow-up") + " ping-button"
+          var buttonClass = (task.pinged ? "deactive " : "") + "glyphicon " + (task.isMine() ? "glyphicon-ok-sign" : "glyphicon-circle-arrow-up") + " ping-button"
           return (
             <div onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onClick={this.handleClick} className="list-group-item" style={{"backgroundColor": this.state.mouseOver ? "#d3d3d3" : "white"}}>
               <span className="badge"><div style={{fontSize: 19}}>{task.get("score")}</div></span>

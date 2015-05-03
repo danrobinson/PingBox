@@ -75,48 +75,54 @@ Parse.Cloud.define("ping", function(request, response) {
   pings.greaterThan("createdAt", today);
   pings.equalTo("creator", request.user);
   
-  pings.find().then(function(results) {
-    if (results.length > 2) {
-      response.error("User has already sent three Pings today.");
-    }
-    results.forEach(function(ping) {
-      if (ping.get("task").id == request.params.taskId) {
-        response.error("User has already pinged that task today.");
-      }
-    });
-  });
-  
-  var tasks = new Parse.Query("Task");
-  tasks.get(request.params.taskId, {
-      success: function(task) {
-        task.increment("score");
-        task.save(null, {
-          error: function(object, error) {
-            console.log("Saving led to error code: " + error.message);
+  pings.find({
+    success: function(results) {
+      if (results.length > 2) {
+        response.error("User has already sent three Pings today.");
+      } else {
+        var match = false;
+        results.forEach(function(ping) {
+          if (ping.get("task").id == request.params.taskId) {
+            match = true;
           }
         });
-        var Ping = Parse.Object.extend("Ping");
-        var ping = new Ping();
-        ping.set("task", task);
-        ping.set("creator", request.user);
-        ping.save({
-          success: function(result) {
-            response.success({
-              task: task,
-              ping: ping
-            });
-          },
-          error: function(error) {
-            response.error(error);
-          }
-        });
+        if (match) {
+          response.error("User has already pinged that task today.");
+        } else {
+          var tasks = new Parse.Query("Task");
+          tasks.get(request.params.taskId, {
+              success: function(task) {
+                task.increment("score");
+                task.save(null, {
+                  error: function(object, error) {
+                    response.error("Saving led to error code: " + error.message);
+                  }
+                });
+                var Ping = Parse.Object.extend("Ping");
+                var ping = new Ping();
+                ping.set("task", task);
+                ping.set("creator", request.user);
+                ping.save({
+                  success: function(result) {
+                    response.success({
+                      task: task,
+                      ping: ping
+                    });
+                  },
+                  error: function(error) {
+                    response.error(error);
+                  }
+                });
+              },
+              error: function(error) {
+                response.error("Task with that objectId not found");
+              }
+            }
+          );
 
-      },
-      error: function(error) {
-        response.error("Task with that objectId not found");
+        }
       }
-    }
-  )
+  }});  
 });
 
 Parse.Cloud.define("todayPings", function(request, response) {
@@ -126,12 +132,8 @@ Parse.Cloud.define("todayPings", function(request, response) {
   var pings = new Parse.Query("Ping");
   pings.greaterThan("createdAt", today);
   pings.equalTo("creator", request.user);
-  pings.find({
-    success: function(results) {
-      response.success(results);
-    },
-    error: function(error) {
-      response.error(error);
-    }
-  });
+
+  pings.find().then(function(results) {
+    response.success(results);
+  })
 });
