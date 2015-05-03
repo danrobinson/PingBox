@@ -63,12 +63,20 @@ Parse.Cloud.define("ping", function(request, response) {
     response.error("User not logged in.");
   }
 
-  if (request.params.taskID === null) {
+  if (request.params.taskId === null) {
     response.error("No task ID");
   }
 
+  // Make sure pinger has not used > 3 pings
+  var pings = new Parse.Query("Ping");
+  // TODO
+
+  // Make sure pinger has not pinged task today
+  var pings = new Parse.Query("Ping");
+  // TODO
+
   var tasks = new Parse.Query("Task");
-  tasks.get(request.params.taskID, {
+  tasks.get(request.params.taskId, {
       success: function(task) {
         task.increment("score");
         task.save(null, {
@@ -98,5 +106,22 @@ Parse.Cloud.define("ping", function(request, response) {
       }
     }
   )
+});
+
+Parse.Cloud.define("todayPings", function(request, response) {
+  var today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  var pings = new Parse.Query("Ping");
+  pings.greaterThan("createdAt", today);
+  pings.equalTo("creator", request.user);
+  pings.find({
+    success: function(results) {
+      response.success(results);
+    },
+    error: function(error) {
+      response.error(error);
+    }
+  });
 });
 

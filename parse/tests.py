@@ -68,6 +68,7 @@ class TestPingBox(unittest.TestCase):
     u = User.login('redsox55', 'secure123')
     with SessionToken(u.sessionToken):
       ParseBatcher().batch_delete(Task.Query.all())
+      ParseBatcher().batch_delete(Ping.Query.all())
 
   def test_create_task(self):
     assignTask = Function("assignTask")
@@ -100,21 +101,58 @@ class TestPingBox(unittest.TestCase):
     assignTask = Function("assignTask")
     ping = Function("ping")
     u = User.login('redsox55', 'secure123')
+    assignee = User.Query.get(username='deepthroat')
     with SessionToken(u.sessionToken):
+      title = 'serha34g444'
+      response = assignTask(
+        title=title,
+        description="Send a ping to this task",
+        watchers=[user[2] for user in sample_users],
+        score=2,
+        assignee=assignee.email,
+      )
+    self.assertIn('task', response['result'])
+
+    with SessionToken(u.sessionToken):
+      task = Task.Query.get(title=title)
+      response = ping(taskId=task.objectId)
+
+    task = Task.Query.get(title=title)
+    self.assertIn('task', response['result'])
+    self.assertIn('ping', response['result'])
+    self.assertEqual(task.score, 1)
+
+  def test_today_pings(self):
+    assignTask = Function("assignTask")
+    ping = Function("ping")
+    u1 = User.login('redsox55', 'secure123')
+    assignee = User.Query.get(username='deepthroat')
+    with SessionToken(u1.sessionToken):
       title = 'serha34g444'
       response = assignTask(
         title=title,
         description="Send a ping to this task",
         watchers=[u[2] for u in sample_users],
         score=2,
+        assignee=assignee.email,
       )
-      task = Task.Query.get(title=title)
-      self.assertEqual(task.score, 0)
-      ping(taskID=task.objectId)
     self.assertIn('task', response['result'])
 
-    task = Task.Query.get(objectId=task.objectId)
-    self.assertEqual(task.score, 1)
+    todayPings = Function('todayPings')
+    with SessionToken(u1.sessionToken):
+      task = Task.Query.get(title=title)
+      ping(taskId=task.objectId)
+      todayPingsU1 = todayPings()
+    print "TODAY PINGS U1: %s" % todayPingsU1
+    self.assertEqual(len(todayPingsU1['result']), 1)
+
+    u2 = User.login('baracky', 'usanumber1')
+    with SessionToken(u2.sessionToken):
+      ping(taskId=task.objectId)
+      ping(taskId=task.objectId)
+      todayPingsU2 = todayPings()
+    print "TODAY PINGS U2: %s" % todayPingsU2
+    self.assertEqual(len(todayPingsU2['result']), 2)
 
 
 """
