@@ -76,13 +76,14 @@ class TestPingBox(unittest.TestCase):
     u = User.login('redsox55', 'secure123')
     with SessionToken(u.sessionToken):
       title = 'w45h45r4g4h'
-      assignTask(
+      response = assignTask(
         title=title,
         description="See title",
         watchers=[user[2] for user in sample_users],
         email=None,
         assignee=assignee.email,
       )
+    self.assertIn('task', response['result'])
 
     tasks = Task.Query.all()
     self.assertEqual(len(tasks), 1)
@@ -90,7 +91,6 @@ class TestPingBox(unittest.TestCase):
     self.assertEqual(t.title, title)
     self.assertEqual(t.creator.objectId, u.objectId)
     self.assertEqual(t.score, 0)
-    print t.__dict__
     self.assertEqual(len(t.watchers), len(sample_users))
     self.assertEqual(t.assignee.objectId, assignee.objectId)
 
@@ -102,7 +102,7 @@ class TestPingBox(unittest.TestCase):
     u = User.login('redsox55', 'secure123')
     with SessionToken(u.sessionToken):
       title = 'serha34g444'
-      assignTask(
+      response = assignTask(
         title=title,
         description="Send a ping to this task",
         watchers=[u[2] for u in sample_users],
@@ -111,10 +111,10 @@ class TestPingBox(unittest.TestCase):
       task = Task.Query.get(title=title)
       self.assertEqual(task.score, 0)
       ping(taskID=task.objectId)
+    self.assertIn('task', response['result'])
 
     task = Task.Query.get(objectId=task.objectId)
     self.assertEqual(task.score, 1)
-
 
 
 """

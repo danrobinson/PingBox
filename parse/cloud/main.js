@@ -35,8 +35,16 @@ Parse.Cloud.define("assignTask", function(request, response) {
         assigneeQuery.find({
           success: function(results) {
             task.set("assignee", results[0]);
-            task.save();
-            response.success();
+            task.save({
+              success: function(result) {
+                response.success({
+                  task: task
+                });
+              },
+              error: function(error) {
+                response.error(error);
+              }
+            });
           },
           error: function(error) {
             response.error("No user found matching assignee.");
@@ -72,9 +80,18 @@ Parse.Cloud.define("ping", function(request, response) {
         var ping = new Ping();
         ping.set("task", task);
         ping.set("creator", request.user);
-        ping.save();
+        ping.save({
+          success: function(result) {
+            response.success({
+              task: task,
+              ping: ping
+            });
+          },
+          error: function(error) {
+            response.error(error);
+          }
+        });
 
-        response.success();
       },
       error: function(error) {
         response.error("Task with that objectId not found");
