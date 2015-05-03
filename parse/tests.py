@@ -2,7 +2,7 @@ import unittest
 
 from parse_rest.connection import register, ParseBatcher, SessionToken
 from parse_rest.user import User
-from parse_rest.datatypes import Object
+from parse_rest.datatypes import Object, Function
 """
 # Prod
 register(
@@ -13,15 +13,19 @@ register(
 """
 
 # Test
-register(
-  "KkFLXaPKXsFkBcTonFsPeNHWJmoIX1K4yvIrmI8C",
-  "6qNCyI4r8YGuMnsh5bfejjQnWevfGWBnfP6vebeX",
-  master_key="MYSUyoDbkeOtEAht7lKr60EvjCXmHntd02e4wNkS",
-)
+def register_app(**kw):
+  register(
+    "KkFLXaPKXsFkBcTonFsPeNHWJmoIX1K4yvIrmI8C",
+    "6qNCyI4r8YGuMnsh5bfejjQnWevfGWBnfP6vebeX",
+    #master_key="MYSUyoDbkeOtEAht7lKr60EvjCXmHntd02e4wNkS",
+    **kw
+  )
 
 class Task(Object):
   pass
 
+class Ping(Object):
+  pass
 
 sample_users = [
   ("baracky", "usanumber1", "baracky.obama@gmail.com"),
@@ -30,12 +34,10 @@ sample_users = [
 
 def signup_sample_users():
   for username, pw, email in sample_users:
-    print "signing up %s" % username
     User.signup(username, pw, email=email)
 
 def delete_sample_users():
   for username, password, email in sample_users:
-    print "deleting %s" % username
     try:
       u = User.login(username, password)
       u.delete()
@@ -43,39 +45,76 @@ def delete_sample_users():
       pass
 
 class TestPingBox(unittest.TestCase):
-
   @classmethod
   def setUpClass(cls):
     delete_sample_users()
     signup_sample_users()
     User.signup('redsox55', 'secure123', email='fred@aol.com')
+    ParseBatcher().batch_delete(Task.Query.all())
 
   @classmethod
   def tearDownClass(cls):
     delete_sample_users()
     u = User.login('redsox55', 'secure123')
+    with SessionToken(u.sessionToken):
+      ParseBatcher().batch_delete(Task.Query.all())
     u.delete()
 
   def setUp(self):
     self.user = User.Query.get(username='redsox55')
 
+  def tearDown(self):
+    u = User.login('redsox55', 'secure123')
+    with SessionToken(u.sessionToken):
+      ParseBatcher().batch_delete(Task.Query.all())
+
   def test_create_task(self):
-    task = Task(
-      title="Write tests for program",
-      description="See title",
-      watchers=[u[2] for u in sample_users],
-      email=None,
-    )
-    with self.assertRaises(Exception):
-      task.save('redsox55', 'secure123')
+    assignTask = Function("assignTask")
 
     u = User.login('redsox55', 'secure123')
     with SessionToken(u.sessionToken):
-      task.save()
+      title = 'w45h45r4g4h'
+      assignTask(
+        title=title,
+        description="See title",
+        watchers=[user[2] for user in sample_users],
+        email=None,
+      )
 
-    # make sure those tasks were created
-    task = Task.Query.filter()
+    tasks = Task.Query.all()
+    self.assertEqual(len(tasks), 1)
+    t = tasks[0]
+    self.assertEqual(t.title, title)
+    self.assertEqual(t.creator.objectId, u.objectId)
+    self.assertEqual(t.score, 0)
+    self.assertEqual(len(t.watchers), len(sample_users))
 
+    self.assertTrue(all(w["className"] == '_User' for w in t.watchers))
+
+  def test_create_ping(self):
+    assignTask = Function("assignTask")
+    ping = Function("ping")
+    u = User.login('redsox55', 'secure123')
+    with SessionToken(u.sessionToken):
+      title = 'serha34g444'
+      assignTask(
+        title=title,
+        description="Send a ping to this task",
+        watchers=[u[2] for u in sample_users],
+        score=2,
+      )
+      task = Task.Query.get(title=title)
+      self.assertEqual(task.score, 0)
+      ping(taskID=task.objectId)
+
+    task = Task.Query.get(objectId=task.objectId)
+    self.assertEqual(task.score, 1)
+
+
+
+
+
+"""
   def test_tasks_by_user(self):
     pass
 
@@ -93,19 +132,10 @@ class TestPingBox(unittest.TestCase):
 
   def test_score_increments(self):
     pass
-
 """
-barack = User.Query.get(username="barack")
-barack.delete()
 
-user = User.signup(
-  username="barack",
-  password="usanumber1",
-  email="barack.obama@gmail.com",
-)
-
-"""
 
 if __name__ == '__main__':
+  register_app()
   unittest.main()
 
