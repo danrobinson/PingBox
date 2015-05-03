@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <title>Parse JavaScript Todo App</title>
-    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
-    <script src="http://www.parsecdn.com/js/parse-1.2.13.min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script src="https://www.parsecdn.com/js/parse-1.2.13.min.js"></script>
     <link rel="stylesheet" href="css/bootstrap.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.2/react-with-addons.js"></script>
@@ -223,15 +223,13 @@
       var AssignTask = React.createClass({
         render: function() {
           return (
-            <div className="add-task">
+            <div className="add-task" style={{margin: "10px"}}>
               <form>
                 <div className="form-group">
-                  <label id="tasktitlelabel" htmlFor="task-title-label">Task Title:</label>
-                  <input type="text" className="form-control" id="tasktitle" placeholder="Task title goes here." />
+                  <input type="text" className="form-control" id="tasktitle" placeholder="Task Title" />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="assigner">Assignee:</label>
-                  <input type="email" className="form-control" id="taskassigner" placeholder="Email Address" />
+                  <input type="email" className="form-control" id="taskassigner" placeholder="Assignee E-mail Address" />
                 </div>
                 <div className="form-group">
                   <label htmlFor="description">Description:</label>
@@ -357,8 +355,8 @@
             <div className="row">
               <div className="col-md-8">
                 <ul className="nav nav-pills">
-                  <li id="me-button" className="active"><a><h3>What People Need From Me</h3></a></li>
-                  <li id="other-button"><a><h3>What I Need From People</h3></a></li>
+                  <li id="me-button" className="active"><a><h3>What I Need To Do</h3></a></li>
+                  <li id="other-button"><a><h3>What I Need From Others</h3></a></li>
                 </ul>
                 <div className="list-group panel panel-primary" id="for-me">
                   <a href="#" className="list-group-item active task-list-header"> {/* panel-heading ? */}
