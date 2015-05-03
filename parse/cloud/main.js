@@ -99,4 +99,3 @@ Parse.Cloud.define("ping", function(request, response) {
     }
   )
 });
-
