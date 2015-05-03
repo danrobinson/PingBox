@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Parse JavaScript Todo App</title>
+    <title>PingBox</title>
     <!-- <link href="css/todos.css" media="all" rel="stylesheet" type="text/css"/> -->
-    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.0.3.min.js"></script>
     <script src="js/underscore.js"></script>
-    <script src="http://www.parsecdn.com/js/parse-1.2.13.min.js"></script>
+    <script src="https://www.parsecdn.com/js/parse-1.2.13.min.js"></script>
     <script src="js/todos.js"></script>
     <link rel="stylesheet" href="css/bootstrap.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
@@ -36,12 +36,43 @@
         //   $(this).animate({'background-color': 'black'});
         // });
     });
+    
+      // set up Facebook
+    // facebook API
+    facebookLogIn = function() {
+        Parse.FacebookUtils.init({
+          appId      : '438605306303003',
+          xfbml      : true,
+          version    : 'v2.3'
+        });
+        
+        console.log("something");
+    
+        Parse.FacebookUtils.logIn(null, {
+            success: function(user) {
+                if (!user.existed()) {
+                    console.log("!");
+                } else {
+                    console.log("User logged in through Facebook!");
+                    location.reload();
+                }
+            },
+            error: function(user, error) {
+                console.log("User cancelled the Facebook login or did not fully authorize.");
+            }
+        });
+     }
+     
+     logOut = function(e) {
+       Parse.User.logOut();
+       location.reload();
+     }
+
     </script>
 
   </head>
 
   <body>
-
     <nav class="navbar navbar-inverse">
       <div class="container-fluid">
         <div class="navbar-header">
@@ -61,7 +92,7 @@
             <li><a href="#">Help</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">Sign in or out or whatever. I don't care.</a></li>
+            <li><button onclick="logOut();">Log Out</button></li>
           </ul>
         </div>
       </div>
@@ -100,6 +131,8 @@
           <button>Sign Up</button>
         </form>
       </div>
+      
+      <button onclick="facebookLogIn()">Log In Through Facebook</button>
     </script>
 
     <script type="text/template" id="manage-todos-template">
@@ -199,7 +232,7 @@
 	<button id="clear-completed">Clear completed (<%= done %>)</button>
       </footer>
     </script>
-
+    
   </body>
 
 </html>
