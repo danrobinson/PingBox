@@ -19,7 +19,7 @@
     <Form xsi:type="ItemRead">
       <DesktopSettings>
         <SourceLocation DefaultValue="https://pingbox.parseapp.com/outlook/read/Home/Home.html"/>
-        <RequestedHeight>250</RequestedHeight>
+        <RequestedHeight>500</RequestedHeight>
       </DesktopSettings>
     </Form>
     <Form xsi:type="ItemEdit">
