@@ -207,17 +207,26 @@
 
       var tasks = pingApp.tasks = new TaskCollection;
       var compare = function(tasks, pings) {
+        /*{
         tasks.each(function(task) {
           pings.each(function(ping) {
-            if (ping.get("task").id == task.id) {
+            if ((ping.get("task").id == task.id) && (ping.get("creator").id == Parse.User.current().id)) {
               task.pinged = true;
             }
           })
-        })
+        })*/
       }
       tasks.on('add remove change sync', function(collection) {
         console.log("Task Event: ", collection);
-        compare(tasks, pings);
+        pings.each(function(ping) {
+          if (ping.get("creator").id == Parse.User.current().id) {
+            tasks.each(function(task) {
+              if (task.id == ping.get("task").id) {
+                task.pinged = true;
+              }
+            })
+          }
+        })
       })
       pings.on('add remove change sync', function(collection) {
         console.log("Pings Event: ", collection);
@@ -396,9 +405,7 @@
         },
         
         handleClick: function(e) {
-          console.log("handling");
           e.preventDefault();
-          console.log(this.state);
           var assignt = this;
           assignt.setState(assignt.getInitialState());
           Parse.Cloud.run("assignTask", {
@@ -487,12 +494,14 @@
         },
 
         handleClick: function(event) {
+          event.preventDefault();
           var el = React.findDOMNode(this);
           $(el).children('.details').slideToggle('fast');
         },
 
         handlePing: function(event) {
           event.stopPropagation();
+          event.preventDefault();
           if (!this.props.task.pinged) {
             this.props.task.ping();            
           }
@@ -502,13 +511,15 @@
           event.stopPropagation();
         },
 
+        /*
+
         handleMouseEnter: function() {
           this.setState({"mouseOver": true})
         },
 
         handleMouseLeave: function() {
           this.setState({"mouseOver": false})
-        },
+        },*/
 
         render: function() {
           var task = this.props.task;
@@ -516,7 +527,7 @@
           var assignee_email = task.get("assignee");
           var buttonClass = (task.pinged ? "deactive " : "") + "glyphicon " + (task.isMine() ? "glyphicon-ok-sign" : "glyphicon-circle-arrow-up") + " ping-button"
           return (
-            <div onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onClick={this.handleClick} className="list-group-item" style={{"backgroundColor": this.state.mouseOver ? "#d3d3d3" : "white"}}>
+            <div onClick={this.handleClick} className="list-group-item" style={{"backgroundColor": this.state.mouseOver ? "#d3d3d3" : "white"}}>
               <span className="badge"><div style={{fontSize: 19}}>{task.get("score")}</div></span>
               <h4 className="list-group-item-heading">
                 {task.get("title")}
