@@ -30,6 +30,7 @@ class Ping(Object):
 sample_users = [
   ("baracky", "usanumber1", "baracky.obama@gmail.com"),
   ("somethingelse", "usanumber4", "ssss@gmail.com"),
+  ('deepthroat', 'lolol', 'doratheexporer@gmail.com'),
 ]
 
 def signup_sample_users():
@@ -55,10 +56,10 @@ class TestPingBox(unittest.TestCase):
   @classmethod
   def tearDownClass(cls):
     delete_sample_users()
-    u = User.login('redsox55', 'secure123')
-    with SessionToken(u.sessionToken):
+    u1 = User.login('redsox55', 'secure123')
+    with SessionToken(u1.sessionToken):
       ParseBatcher().batch_delete(Task.Query.all())
-    u.delete()
+    u1.delete()
 
   def setUp(self):
     self.user = User.Query.get(username='redsox55')
@@ -71,6 +72,7 @@ class TestPingBox(unittest.TestCase):
   def test_create_task(self):
     assignTask = Function("assignTask")
 
+    assignee = User.Query.get(username='deepthroat')
     u = User.login('redsox55', 'secure123')
     with SessionToken(u.sessionToken):
       title = 'w45h45r4g4h'
@@ -79,6 +81,7 @@ class TestPingBox(unittest.TestCase):
         description="See title",
         watchers=[user[2] for user in sample_users],
         email=None,
+        assignee=assignee.email,
       )
 
     tasks = Task.Query.all()
@@ -87,7 +90,9 @@ class TestPingBox(unittest.TestCase):
     self.assertEqual(t.title, title)
     self.assertEqual(t.creator.objectId, u.objectId)
     self.assertEqual(t.score, 0)
+    print t.__dict__
     self.assertEqual(len(t.watchers), len(sample_users))
+    self.assertEqual(t.assignee.objectId, assignee.objectId)
 
     self.assertTrue(all(w["className"] == '_User' for w in t.watchers))
 
@@ -109,8 +114,6 @@ class TestPingBox(unittest.TestCase):
 
     task = Task.Query.get(objectId=task.objectId)
     self.assertEqual(task.score, 1)
-
-
 
 
 
