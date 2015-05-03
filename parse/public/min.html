@@ -7,6 +7,7 @@
     <script src="http://www.parsecdn.com/js/parse-1.2.13.min.js"></script>
     <link rel="stylesheet" href="css/bootstrap.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="js/parse.js"></script>
     <style type="text/css">
     .details, .add-task {
         display: none;
@@ -55,9 +56,6 @@
           // $(this).children('.add-task').show();
           $('.add-task').slideToggle('fast');
         });
-        // $('#new-button').click(function () {
-        //   $('.add-task').hide();
-        // });
 
         $('.list-group-item:not(.task-list-header)').mouseover(function(){
           $(this).css('background-color', '#d3d3d3');
@@ -68,21 +66,18 @@
 
         // id="for-others"
         $("#other-button").click(function() {
-          $("#for-others").show(200)
-          $("#for-me").hide(200)
-          $("#other-button").addClass("active")
-          $("#me-button").removeClass("active")
+          $("#for-others").slideDown(200);
+          $("#for-me").slideUp(200);
+          $("#other-button").addClass("active");
+          $("#me-button").removeClass("active");
         })
         $("#me-button").click(function() {
-          $("#for-me").show(200)
-          $("#for-others").hide(200)
-          $("#other-button").removeClass("active")
-          $("#me-button").addClass("active")
+          $("#for-me").slideDown(200);
+          $("#for-others").slideUp(200);
+          $("#other-button").removeClass("active");
+          $("#me-button").addClass("active");
         })
 
-        // $('.list-group-item').mouseover(function(){
-        //   $(this).animate({'background-color': 'black'});
-        // });
     });
     </script>
 

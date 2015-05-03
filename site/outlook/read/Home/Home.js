@@ -23,6 +23,7 @@
         $('#taskassigner').val(Office.context.mailbox.userProfile.emailAddress);
 
         // Add the email sender to the watchlist
+        var watchlist = [];
         var from;
         if (item.itemType === Office.MailboxEnums.ItemType.Message) {
             from = Office.cast.item.toMessageRead(item).from;
@@ -30,15 +31,17 @@
             from = Office.cast.item.toAppointmentRead(item).organizer;
         }
         if (from) {
-           $('#taskwatch0').val(from.emailAddress);
+           // $('#taskwatch0').val(from.emailAddress);
+           watchlist = watchlist.concat(from.emailAddress);
         }
 
         // Add CC recipients to watch list
         if (item.itemType === Office.MailboxEnums.ItemType.Message) {
             var cc = Office.context.mailbox.item.cc;
-            $('#tmp').val(cc.length);
             for (var i=0; i < cc.length; i++) {
-                $('#taskwatchers').append('<input type="email" class="form-control" value="'+cc[i].emailAddress+'">');
+                watchlist = watchlist.concat(cc[i].emailAddress);
+                $('#taskassigner').val(watchlist.concat(cc[0].emailAddress));
+                // $('#taskwatchers').concat('<input type="email" class="form-control" value="'+cc[i].emailAddress+'">');
             }
         } else if (item.itemType === Office.MailboxEnums.ItemType.Appointment) {
             // TODO(cjr) add support for appointments
@@ -47,20 +50,16 @@
         // Add TO recipients to watch list
         if (item.itemType === Office.MailboxEnums.ItemType.Message) {
             var to = Office.context.mailbox.item.to;
-            $('#tmp').val(to.length);
             for (var i=0; i < to.length; i++) {
-                $('#taskwatchers').append('<input type="email" class="form-control" value="'+to[i].emailAddress+'">');
+                // $('#taskwatchers').concat('<input type="email" class="form-control" value="'+to[i].emailAddress+'">');
+                watchlist = watchlist.concat(to[i].emailAddress);
             }
         } else if (item.itemType === Office.MailboxEnums.ItemType.Appointment) {
             // TODO(cjr) add support for appointments
         }
 
-        $('#tmp').val(item.internetMessageId + '\n' + Office.context.mailbox.item.body);
+        var watchEmails = watchlist.join(', ');
+        $('#taskwatch').val(watchEmails);
 
-        // var desc = item.body;
-        // if (desc.length > 300) {
-        //     desc = desc.substr(0, 297) + "...";
-        // }
-        // $('#taskdesc').val(desc);
     }
 })();
