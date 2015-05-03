@@ -67,14 +67,25 @@ Parse.Cloud.define("ping", function(request, response) {
     response.error("No task ID");
   }
 
-  // Make sure pinger has not used > 3 pings
-  var pings = new Parse.Query("Ping");
-  // TODO
+  // Make sure pinger has not used > 3 pings or pinged this task today
+  var today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  // Make sure pinger has not pinged task today
   var pings = new Parse.Query("Ping");
-  // TODO
-
+  pings.greaterThan("createdAt", today);
+  pings.equalTo("creator", request.user);
+  
+  pings.find().then(function(results) {
+    if (results.length > 2) {
+      response.error("User has already sent three Pings today.");
+    }
+    results.forEach(function(ping) {
+      if (ping.get("task").id == request.params.taskId) {
+        response.error("User has already pinged that task today.");
+      }
+    });
+  });
+  
   var tasks = new Parse.Query("Task");
   tasks.get(request.params.taskId, {
       success: function(task) {
