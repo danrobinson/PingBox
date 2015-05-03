@@ -223,15 +223,13 @@
       var AssignTask = React.createClass({
         render: function() {
           return (
-            <div className="add-task">
+            <div className="add-task" style={{margin: "10px"}}>
               <form>
                 <div className="form-group">
-                  <label id="tasktitlelabel" htmlFor="task-title-label">Task Title:</label>
-                  <input type="text" className="form-control" id="tasktitle" placeholder="Task title goes here." />
+                  <input type="text" className="form-control" id="tasktitle" placeholder="Task Title" />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="assigner">Assignee:</label>
-                  <input type="email" className="form-control" id="taskassigner" placeholder="Email Address" />
+                  <input type="email" className="form-control" id="taskassigner" placeholder="Assignee E-mail Address" />
                 </div>
                 <div className="form-group">
                   <label htmlFor="description">Description:</label>
