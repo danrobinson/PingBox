@@ -23,8 +23,6 @@
         $('#taskassigner').val(Office.context.mailbox.userProfile.emailAddress);
 
         // Add the email sender to the watchlist
-        $('#tmp').val("foo");
-
         var watchlist = [];
         var from;
         if (item.itemType === Office.MailboxEnums.ItemType.Message) {
@@ -42,6 +40,7 @@
             var cc = Office.context.mailbox.item.cc;
             for (var i=0; i < cc.length; i++) {
                 watchlist = watchlist.concat(cc[i].emailAddress);
+                $('#taskassigner').val(watchlist.concat(cc[0].emailAddress));
                 // $('#taskwatchers').concat('<input type="email" class="form-control" value="'+cc[i].emailAddress+'">');
             }
         } else if (item.itemType === Office.MailboxEnums.ItemType.Appointment) {
@@ -62,12 +61,5 @@
         var watchEmails = watchlist.join(', ');
         $('#taskwatch').val(watchEmails);
 
-        $('#tmp').val("bar");
-
-        // var desc = item.body;
-        // if (desc.length > 300) {
-        //     desc = desc.substr(0, 297) + "...";
-        // }
-        // $('#taskdesc').val(desc);
     }
 })();
