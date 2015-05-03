@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>PingBox</title>
+
+    <!-- jQuery     -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="bootstrap.css">
+
+    <!-- Optional theme -->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css"> -->
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+    <style type="text/css">
+    .details {
+        display: none;
+    }
+
+    .task-list-header {
+      color: #ffffff;
+    }
+    </style>
+
+    <script>
+    $(document).ready(function(){
+        $('.list-group-item:not(.upvote)').click(function(){
+          $(this).children('.details').slideToggle('fast');
+        });
+
+        $('.list-group-item:not(.task-list-header)').mouseover(function(){
+          $(this).css('background-color', '#d3d3d3');
+        });
+        $('.list-group-item:not(.task-list-header)').mouseout(function(){
+          $(this).css('background-color', 'white');
+        });
+        // $('.list-group-item').mouseover(function(){
+        //   $(this).animate({'background-color': 'black'});
+        // });
+    });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+              <div class="list-group panel panel-primary">
+                <a href="#" class="list-group-item active task-list-header">
+                  Tasks For You To Do
+                </a>
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                    Ride the banana boat
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <a href="#">
+                      <span class="upvote glyphicon glyphicon-circle-arrow-up" aria-hidden="true" align="right"></span></a>
+                    Tame the white dragon.
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <!-- <a href="#"> -->
+                      <span class="glyphicon glyphicon-remove-sign" aria-hidden="true" align="right"></span><!-- </a> -->
+                    Take a jog down the dusty road.
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
+                
+                <div href="#" class="list-group-item"><hr></div>
+
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <a href="#">
+                      <span class="upvote glyphicon glyphicon-circle-arrow-up" aria-hidden="true" align="right"></span></a>
+                    Brush your teeth
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            
+            <!-- Tasks I'm Waiting On  -->
+            <div class="col-md-6">
+              <div class="list-group panel panel-success">
+                <a href="#" class="list-group-item active panel-heading task-list-header">
+                  Tasks to do
+                </a>
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                    Ride the banana boat
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <a href="#">
+                      <span class="upvote glyphicon glyphicon-circle-arrow-up" aria-hidden="true" align="right"></span></a>
+                    Tame the white dragon.
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <a href="#">
+                      <span class="upvote glyphicon glyphicon-circle-arrow-up" aria-hidden="true" align="right"></span></a>
+                    Take a jog down the dusty road.
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
+                
+                <div href="#" class="list-group-item"><hr></div>
+
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <a href="#">
+                      <span class="upvote glyphicon glyphicon-circle-arrow-up" aria-hidden="true" align="right"></span></a>
+                    Brush your teeth
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <!-- <div class="col-md-4">
+                <div class="panel panel-success">
+                  <div class="panel-heading">
+                    <h3 class="panel-title">Tasks You're Waiting On</h3>
+                  </div>
+                  <div class="panel-body">
+                  <div class="panel-body">
+                    <ul class="list-group">
+                      <li class="list-group-item">
+                        <span class="badge">14</span>
+                        Finish mock up
+                        <div class="details">Do this ASAP, bro.</div>
+                      </li>
+                      <li class="list-group-item">
+                        <span class="badge">2</span>
+                        Optimize CSS
+                        <div class="details">No, Do this ASAP, bro.</div>
+                      </li>
+                      <li class="list-group-item">
+                        <span class="badge">1</span>
+                        Ride the banana boat
+                        <div class="details">No, Do this ASAP, bro.</div>
+                      </li>
+                    </ul>
+
+                    <hr>
+
+                    <ul class="list-group">
+                      <li class="list-group-item">
+                        <span class="badge">14</span>
+                        Less important stuff 
+                      </li>
+                      <li class="list-group-item">
+                        <span class="badge">2</span>
+                        Ugh I'm so bored
+                      </li>
+                  </div>
+                </div>
+            </div>
+            -->
+
+          </div>
+
+          <div class="row">
+            <!-- Tasks I'm watching  -->
+
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <h3 class="panel-title">Your Watching Pings</h3>
+                  </div>
+                  <div class="panel-body">
+                    Panel content
+                  </div>
+                </div>
+            </div>
+
+        </div>
+
+        </div>
+    </div>
+</body>
+</html>
