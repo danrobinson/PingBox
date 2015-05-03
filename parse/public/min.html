@@ -7,7 +7,7 @@
     <script src="http://www.parsecdn.com/js/parse-1.2.13.min.js"></script>
     <link rel="stylesheet" href="css/bootstrap.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.2/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.2/react-with-addons.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.2/JSXTransformer.js"></script>
 
     <script src="js/parse.js"></script>
@@ -121,7 +121,23 @@
       });
 
       var tasks = pingApp.tasks = new TaskCollection;
-      tasks.on('add remove change sync', function(collection) {console.log("Task Event: ", collection)})
+      var compare = function(tasks, pings) {
+        tasks.each(function(task) {
+          pings.each(function(ping) {
+            if (ping.get("task").id == task.id) {
+              task.pinged = true;
+            }
+          })
+        })
+      }
+      tasks.on('add remove change sync', function(collection) {
+        console.log("Task Event: ", collection);
+        compare(tasks, pings);
+      })
+      pings.on('add remove change sync', function(collection) {
+        console.log("Pings Event: ", collection);
+        compare(tasks, pings);
+      })
       tasks.fetch();
 
       // Components
@@ -211,16 +227,11 @@
               <form>
                 <div className="form-group">
                   <label id="tasktitlelabel" htmlFor="task-title-label">Task Title:</label>
-                  {/* TODO(cjr): is it okay that type is email? */}
                   <input type="text" className="form-control" id="tasktitle" placeholder="Task title goes here." />
                 </div>
                 <div className="form-group">
                   <label htmlFor="assigner">Assignee:</label>
-                  <input type="email" className="form-control" id="taskassigner" placeholder="EMAIL ADDRESS" />
-                </div>
-                <div className="form-group" id="taskwatchers">
-                  <label htmlFor="watchlist">Watch list:</label>
-                  <input type="email" className="form-control" id="taskwatch0" placeholder="EMAIL ADDRESS" />
+                  <input type="email" className="form-control" id="taskassigner" placeholder="Email Address" />
                 </div>
                 <div className="form-group">
                   <label htmlFor="description">Description:</label>
@@ -307,8 +318,6 @@
               <div className="details"> 
                 <div><b>Requester:</b> <a href="#">{task.get("requester")}</a></div>
                 {!task.isMine() ? <div><b>Assignee</b>: <a href="#">{task.get("assignee")}</a></div> : null}
-                <div><b>Watchers:</b> 
-                </div>
                 <div><b>Description:</b> {task.get("description")}</div>
               </div>
             </div>
