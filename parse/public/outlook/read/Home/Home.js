@@ -14,6 +14,11 @@
 
     // Displays the "Subject" and "From" fields, based on the current mail item
     function displayItemDetails() {
+        $("#assign-success").hide();
+        $("#assign-alert").hide();
+        $("#login-alert").hide();
+
+        
         Parse.initialize("8fhsO5d7WTt6c7ffpVrPpHTVvuAi6vArrciyt8cK", 
                          "1GHMsEbKTKr7ZhLqcJUPcOJdi7CLD1YZeT4hGuEv");
 
@@ -79,9 +84,7 @@
           var description = $('#taskdesc').val();
           var watchers = $('#taskwatch').val().replace(/ /g, '').split(",");      
           var email = null;  // TODO: set up link to email
-          
-          write(title + " " + assignee);
-          
+                    
           Parse.Cloud.run("assignTask", {
             title: title,
             description: description,
@@ -90,10 +93,12 @@
             email: email,
           }, {
             success: function(result) {
-              $("#assign-success").html("Task created!");
+              $("#assign-success").show();
+              $("#assign-success").html("Task created! <a onclick = \"window.open('http://pingbox.parseapp.com');\">Track it here</a>");
             },
             error: function(error) {
-              $("#assign-alert").html("error " + error.message);
+              $("#assign-alert").show();
+              $("#assign-alert").html("Error: " + error.message);
             }
           })
         });
@@ -103,12 +108,14 @@
           var username = $("#username").val();
           var password = $("#password").val();
 
+
           Parse.User.logIn(username, password, {
             success: function(user) {
               displayItemDetails();
             },
             error: function(user, error) {
-              $("#login-alert").html("Error: " + error.message);
+              $("#login-alert").show();
+              $("#login-alert").html("Error: " + error.message + " " + username + " " + password);
             }
           });
         });
@@ -116,7 +123,5 @@
           Parse.User.logOut();
           displayItemDetails();
         });
-                
-        write("console 8");
     }
 })();
