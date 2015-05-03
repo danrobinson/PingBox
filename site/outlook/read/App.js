@@ -1,5 +1,7 @@
 ﻿/* Common app functionality */
 
+var ex = 11;
+
 var app = (function () {
     "use strict";
 
