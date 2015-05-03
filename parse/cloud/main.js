@@ -124,4 +124,3 @@ Parse.Cloud.define("todayPings", function(request, response) {
     }
   });
 });
-
