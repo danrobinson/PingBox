@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Parse JavaScript Todo App</title>
+    <title>PingBox</title>
     <script src="https://code.jquery.com/jquery-2.0.3.min.js"></script>
     <script src="https://www.parsecdn.com/js/parse-1.2.13.min.js"></script>
     <link rel="stylesheet" href="css/bootstrap.css">
@@ -281,11 +281,8 @@
                 <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                   <ul className="nav navbar-nav">
                     <li className="active"><a href="#">App <span className="sr-only">(current)</span></a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Help</a></li>
                   </ul>
                   <ul className="nav navbar-nav navbar-right">
-                    <li><a href="#">Log Out</a></li>
                   </ul>
                 </div>
               </div>
@@ -332,7 +329,7 @@
               <span className="badge"><div style={{fontSize: 19}}>{task.get("score")}</div></span>
               <h4 className="list-group-item-heading">
                 {task.get("title")}
-                <PingButton task={task} handleClick={task.isMine() ? this.handleCheck : this.handlePing} />
+                {!task.isMine() ? <PingButton task={task} handleClick={task.isMine() ? this.handleCheck : this.handlePing} /> : null }
               </h4>
               <div className="details"> 
                 <div><b>Requester:</b> <a href="#">{task.get("requester")}</a></div>
