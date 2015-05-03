@@ -18,6 +18,10 @@
     .task-list-header {
       color: #ffffff;
     }
+
+    #for-others {
+        display: none;
+    }
     </style>
 
     <script>
@@ -32,6 +36,21 @@
         $('.list-group-item:not(.task-list-header)').mouseout(function(){
           $(this).css('background-color', 'white');
         });
+
+        // id="for-others"
+        $("#other-button").click(function() {
+          $("#for-others").show(200)
+          $("#for-me").hide(200)
+          $("#other-button").addClass("active")
+          $("#me-button").removeClass("active")
+        })
+        $("#me-button").click(function() {
+          $("#for-me").show(200)
+          $("#for-others").hide(200)
+          $("#other-button").removeClass("active")
+          $("#me-button").addClass("active")
+        })
+
         // $('.list-group-item').mouseover(function(){
         //   $(this).animate({'background-color': 'black'});
         // });
@@ -105,10 +124,16 @@
     <script type="text/template" id="manage-todos-template">
           <div class="container"
           <div class="row">
+
             <div class="col-md-8">
-              <div class="list-group panel panel-primary">
+              <ul class="nav nav-pills">
+                <li id="me-button" class="active"><a><h3>What People Need From Me</h3></a></li>
+                <li id="other-button"><a><h3>What I Need From People</h3></a></li>
+              </ul>
+
+              <div class="list-group panel panel-primary" id="for-me">
                 <a href="#" class="list-group-item active task-list-header"> <!-- panel-heading ? -->
-                  Tasks For You To Do
+                  <!-- Tasks For You To Do -->
                 </a>
                 <div class="list-group-item">
                   <span class="badge">1</span>
@@ -164,6 +189,67 @@
                       <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
                   </div>
                 </div>
+              </div>
+
+              <div class="list-group panel panel-success" id="for-others">
+                <a href="#" class="list-group-item active panel-heading task-list-header">
+                  <!-- Tasks For Others To Do  -->
+                </a>
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                    Ride the other banana boat
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <a href="#">
+                      <span class="upvote glyphicon glyphicon-circle-arrow-up" aria-hidden="true" align="right"></span></a>
+                    Tame the white dragon.
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <!-- <a href="#"> -->
+                      <span class="glyphicon glyphicon-remove-sign" aria-hidden="true" align="right"></span><!-- </a> -->
+                    Take a jog down the dusty road.
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
+                
+                <div href="#" class="list-group-item"><hr></div>
+
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <a href="#">
+                      <span class="upvote glyphicon glyphicon-circle-arrow-up" aria-hidden="true" align="right"></span></a>
+                    Brush your teeth
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
+
 
               </div>
             </div>
