@@ -3,22 +3,73 @@
   <head>
     <meta charset="utf-8">
     <title>Parse JavaScript Todo App</title>
-    <link href="css/todos.css" media="all" rel="stylesheet" type="text/css"/>
+    <!-- <link href="css/todos.css" media="all" rel="stylesheet" type="text/css"/> -->
     <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
     <script src="js/underscore.js"></script>
     <script src="http://www.parsecdn.com/js/parse-1.2.13.min.js"></script>
     <script src="js/todos.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <style type="text/css">
+    .details {
+        display: none;
+    }
+
+    .task-list-header {
+      color: #ffffff;
+    }
+    </style>
+
+    <script>
+    $(document).ready(function(){
+        $('.list-group-item:not(.upvote)').click(function(){
+          $(this).children('.details').slideToggle('fast');
+        });
+
+        $('.list-group-item:not(.task-list-header)').mouseover(function(){
+          $(this).css('background-color', '#d3d3d3');
+        });
+        $('.list-group-item:not(.task-list-header)').mouseout(function(){
+          $(this).css('background-color', 'white');
+        });
+        // $('.list-group-item').mouseover(function(){
+        //   $(this).animate({'background-color': 'black'});
+        // });
+    });
+    </script>
+
   </head>
 
   <body>
 
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">PingBox</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">App <span class="sr-only">(current)</span></a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Help</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#">Sign in or out or whatever. I don't care.</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
     <!-- Todo App Interface -->
 
     <div id="todoapp">
-      <div class="title">
-        <h1>Parse Todos</h1>
-      </div>
-
       <div class="content">
       </div>
     </div>
@@ -52,27 +103,72 @@
     </script>
 
     <script type="text/template" id="manage-todos-template">
-      <div id="user-info">
-        Signed in as <%= Parse.User.current().escape("username") %> (<a href="#" class="log-out">Log out</a>)
-      </div>
+          <div class="container"
+          <div class="row">
+            <div class="col-md-8">
+              <div class="list-group panel panel-primary">
+                <a href="#" class="list-group-item active task-list-header"> <!-- panel-heading ? -->
+                  Tasks For You To Do
+                </a>
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                    Ride the banana boat
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <a href="#">
+                      <span class="upvote glyphicon glyphicon-circle-arrow-up" aria-hidden="true" align="right"></span></a>
+                    Tame the white dragon.
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <!-- <a href="#"> -->
+                      <span class="glyphicon glyphicon-remove-sign" aria-hidden="true" align="right"></span><!-- </a> -->
+                    Take a jog down the dusty road.
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
+                
+                <div href="#" class="list-group-item"><hr></div>
 
-      <div class="section">
+                <div class="list-group-item">
+                  <span class="badge">1</span>
+                  <h4 class="list-group-item-heading">
+                    <a href="#">
+                      <span class="upvote glyphicon glyphicon-circle-arrow-up" aria-hidden="true" align="right"></span></a>
+                    Brush your teeth
+                  </h4>
+                  <div class="details"> 
+                    <div><b>Requester:</b> <a href="#">christopher.riederer@gmail.com</a></div>
+                      <div><b>Watchers:</b> <a href="#">...</a></div>
+                      <div><b>Description:</b> Sometimes, in order to recover from a night of indulgence, the only thing one can do is ride the banana boat. Hop aboard, friend!</div>
+                  </div>
+                </div>
 
-        <header id="header">
-          <input id="new-todo" placeholder="What needs to be done?" type="text" />
-        </header>
-
-        <div id="main">
-          <input id="toggle-all" type="checkbox">
-          <label for="toggle-all">Mark all as complete</label>
-          
-          <ul id="todo-list">
-            <img src='images/spinner.gif' class='spinner' />
-          </ul>
-        </div>
-
-        <div id="todo-stats"></div>
-      </div>
+              </div>
+            </div>
+            </div>
+          </div>
     </script>
 
     <script type="text/template" id="item-template">
