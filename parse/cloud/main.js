@@ -17,43 +17,26 @@ Parse.Cloud.define("assignTask", function(request, response) {
   task.set("score", 0);
   task.set("creator", request.user);
 
-  var emails = request.params.watchers;
-  var watcherQuery = new Parse.Query("_User");
-  watcherQuery.containedIn('email', emails);
-  watcherQuery.find({
+  // Set assignee
+  var assigneeEmail = request.params.assignee;
+  var assigneeQuery = new Parse.Query("_User");
+  assigneeQuery.equalTo('email', assigneeEmail);
+  assigneeQuery.find({
     success: function(results) {
-      if (results.length == 0) {
-        // TODO: Email invite functionality.
-        response.error("No watchers signed up with PingBox.");
-      } else {
-        task.set("watchers", results);
-
-        // Set assignee
-        var assigneeEmail = request.params.assignee;
-        var assigneeQuery = new Parse.Query("_User");
-        assigneeQuery.equalTo('email', assigneeEmail);
-        assigneeQuery.find({
-          success: function(results) {
-            task.set("assignee", results[0]);
-            task.save({
-              success: function(result) {
-                response.success({
-                  task: task
-                });
-              },
-              error: function(error) {
-                response.error(error);
-              }
-            });
-          },
-          error: function(error) {
-            response.error("No user found matching assignee.");
-          }
-        });
-      }
+      task.set("assignee", results[0]);
+      task.save({
+        success: function(result) {
+          response.success({
+            task: task
+          });
+        },
+        error: function(error) {
+          response.error(error);
+        }
+      });
     },
-    error: function() {
-      response.error("User lookup failed.");
+    error: function(error) {
+      response.error("No user found matching assignee.");
     }
   });
 });

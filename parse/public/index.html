@@ -60,8 +60,6 @@
     // set up Parse
     Parse.initialize("8fhsO5d7WTt6c7ffpVrPpHTVvuAi6vArrciyt8cK", "1GHMsEbKTKr7ZhLqcJUPcOJdi7CLD1YZeT4hGuEv");
 
-    /*
-
     Parse.User.logIn("DavidRobinson", "david", {
       success: function(user) {
         console.log("Login successful")
@@ -70,8 +68,6 @@
         console.log("Login error: ", error)
       }
     });
-
-    */
 
     (function() {
       "use strict";
@@ -89,7 +85,7 @@
       var pings = pingApp.pings = new PingCollection;
       pings.fetch();
 
-      var TaskClass = Parse.Object.extend("Task", {
+      var TaskClass = pingApp.TaskClass = Parse.Object.extend("Task", {
         isMine: function() {
           var user = Parse.User.current();
           return (this.get("assignee").id == user.id);
@@ -117,7 +113,7 @@
 
       var TaskCollection = Parse.Collection.extend({
         model: TaskClass,
-        query: new Parse.Query("Task")
+        query: new Parse.Query("Task").descending("score")
       });
 
       var tasks = pingApp.tasks = new TaskCollection;
@@ -221,21 +217,45 @@
       });
 
       var AssignTask = React.createClass({
+        mixins: [React.addons.LinkedStateMixin],
+        
+        getInitialState: function() {
+          return {
+            title: "",
+            assignee: "",
+            description: ""
+          };
+        },
+        
+        handleClick: function(e) {
+          console.log("handling");
+          e.preventDefault();
+          console.log(this.state);
+          Parse.Cloud.run("assignTask", {
+            title: this.state.title,
+            assignee: this.state.assignee,
+            description: this.state.description
+          }, {
+            success: function(result) {
+              console.log(result);
+            }
+          })
+        },
+      
         render: function() {
           return (
             <div className="add-task" style={{margin: "10px"}}>
-              <form>
+              <form >
                 <div className="form-group">
-                  <input type="text" className="form-control" id="tasktitle" placeholder="Task Title" />
+                  <input type="text" className="form-control" id="tasktitle" valueLink={this.linkState('title')} placeholder="Task Title" />
                 </div>
                 <div className="form-group">
-                  <input type="email" className="form-control" id="taskassigner" placeholder="Assignee E-mail Address" />
+                  <input type="email" className="form-control" id="taskassigner" valueLink={this.linkState('assignee')} placeholder="Assignee E-mail Address" />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="description">Description:</label>
-                  <textarea className="form-control" id="taskdesc" placeholder="Task description" maxLength={300} />
+                  <textarea className="form-control" id="taskdesc" valueLink={this.linkState('description')} placeholder="Brief Task Description" maxLength={300} />
                 </div>
-                <button type="submit" className="btn btn-default">Submit</button>
+                <button type="submit" onClick={this.handleClick} className="btn btn-default">Submit</button>
               </form>
             </div>
           );
@@ -370,7 +390,7 @@
                 </div>
                 <div className="list-group panel panel-success" id="for-others">
                   <div href="#" id="other-panel" className="list-group-item active panel-heading task-list-header">
-                    <h4>Tell Someone You Need Something
+                    <h4>Send an Assignment
                       <span style={{fontSize: 26}} id="new-button" onClick={this.newButton} className="glyphicon glyphicon-plus-sign ping-button" aria-hidden="true" align="right" />
                     </h4>
                   </div>
