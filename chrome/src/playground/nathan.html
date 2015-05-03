@@ -1,0 +1,85 @@
+<html>
+
+<script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
+
+<script>
+
+var myFirebaseRef = new Firebase("https://pingbox.firebaseio.com/");
+//var myFirebaseRef = new Firebase("https://fiery-fire-379.firebaseio.com/");
+
+var usersRef = myFirebaseRef.child('users');
+var tasksRef = myFirebaseRef.child('tasks');
+var pingsRef = myFirebaseRef.child('pings');
+
+/*
+var userInfo = {
+	firstName: "Nathan",
+	lastName: "Gould"
+}
+
+var user = usersRef.set({"nathan,gould@gmail,com": userInfo});
+
+var task = tasksRef.push({
+	title: "New Task",
+	description: "New Description"
+});
+
+var ping = pingsRef.push({
+    task: task.key(),
+    pinger: "nathan,gould@gmail.com"
+});
+*/
+
+function addUser(info) {
+    usersRef.push(info);
+};
+
+// Unit tests
+tasksRef.push({
+    title: "Check revisions",
+    description: "Please check my revisions",
+    datetime: 'LOOKUP RULE',
+
+})
+
+var task = tasksRef.push({
+	title: "New Task",
+	description: "New Description"
+});
+
+var user1 = {
+    email: "nathan.gould@gmail.com",
+	firstName: "Nathan",
+	lastName: "Gould"
+};
+
+var user2 = {
+    email: "barack.obama@gmail.com",
+	firstName: "Barry",
+	lastName: "Obama"
+};
+
+function listUsers() {
+    usersRef.orderByKey().on("child_added", function(s) {
+        console.log(s.key());
+    });
+};
+
+addUser(user1);
+addUser(user2);
+
+listUsers();
+
+</script>
+
+
+
+<body>
+
+
+Hello World
+
+
+</body>
+
+</html>
