@@ -266,7 +266,7 @@
                     <li><a href="#">Help</a></li>
                   </ul>
                   <ul className="nav navbar-nav navbar-right">
-                    <li><a href="#">Sign in or out or whatever, who cares.</a></li>
+                    <li><a href="#">Log Out</a></li>
                   </ul>
                 </div>
               </div>
@@ -317,7 +317,7 @@
               </h4>
               <div className="details"> 
                 <div><b>Requester:</b> <a href="#">{task.get("requester")}</a></div>
-                {!task.isMine() ? <div><b>Assignee</b>: <a href="#">{task.get("assignee")}</a></div> : null}
+                {!task.isMine() ? <div><b>Assignee</b>: <a href="#">{task.get("assignee").email}</a></div> : null}
                 <div><b>Description:</b> {task.get("description")}</div>
               </div>
             </div>
