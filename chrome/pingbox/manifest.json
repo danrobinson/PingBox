@@ -10,11 +10,8 @@
     }
   ],
   "web_accessible_resources": [
-    "jquery-1.10.2.min.js",
     "gmail.js",
-    "JSXTransformer.js",
-    "react-with-addons.min.js",
-    "main.js"
+    "main.bundle.js"
   ],
   "manifest_version": 2
 }

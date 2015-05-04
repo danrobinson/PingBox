@@ -546,6 +546,7 @@
       var MainPage = React.createClass({
 
         render: function() {
+          this.props.tasks.fetch();
           var currentUser = Parse.User.current();
           var content;
           var main = this;

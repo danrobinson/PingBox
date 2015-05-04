@@ -1,0 +1,183 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', '-g', 'install', 'react' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.32
+4 verbose cache add [ 'react', null ]
+5 verbose cache add name=undefined spec="react" args=["react",null]
+6 verbose parsed url { protocol: null,
+6 verbose parsed url   slashes: null,
+6 verbose parsed url   auth: null,
+6 verbose parsed url   host: null,
+6 verbose parsed url   port: null,
+6 verbose parsed url   hostname: null,
+6 verbose parsed url   hash: null,
+6 verbose parsed url   search: null,
+6 verbose parsed url   query: null,
+6 verbose parsed url   pathname: 'react',
+6 verbose parsed url   path: 'react',
+6 verbose parsed url   href: 'react' }
+7 silly lockFile 6b810c90-react react
+8 verbose lock react /Users/danielrobinson/.npm/6b810c90-react.lock
+9 silly lockFile 6b810c90-react react
+10 silly lockFile 6b810c90-react react
+11 verbose addNamed [ 'react', '' ]
+12 verbose addNamed [ null, '*' ]
+13 silly lockFile 0baa5bb3-react react@
+14 verbose lock react@ /Users/danielrobinson/.npm/0baa5bb3-react.lock
+15 silly addNameRange { name: 'react', range: '*', hasData: false }
+16 verbose request where is /react
+17 verbose request registry https://registry.npmjs.org/
+18 verbose request id d31dbec4c257b18a
+19 verbose url raw /react
+20 verbose url resolving [ 'https://registry.npmjs.org/', './react' ]
+21 verbose url resolved https://registry.npmjs.org/react
+22 verbose request where is https://registry.npmjs.org/react
+23 info trying registry request attempt 1 at 03:06:43
+24 verbose etag "BSYVO92WDX9X09UZFYCB2AR4"
+25 http GET https://registry.npmjs.org/react
+26 http 200 https://registry.npmjs.org/react
+27 silly registry.get cb [ 200,
+27 silly registry.get   { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+27 silly registry.get     etag: '"QPJN7C9Z5XIB35O1JVLQ629O"',
+27 silly registry.get     'content-type': 'application/json',
+27 silly registry.get     'cache-control': 'max-age=60',
+27 silly registry.get     'content-length': '57471',
+27 silly registry.get     'accept-ranges': 'bytes',
+27 silly registry.get     date: 'Sun, 03 May 2015 07:06:43 GMT',
+27 silly registry.get     via: '1.1 varnish',
+27 silly registry.get     age: '53',
+27 silly registry.get     connection: 'keep-alive',
+27 silly registry.get     'x-served-by': 'cache-jfk1035-JFK',
+27 silly registry.get     'x-cache': 'HIT',
+27 silly registry.get     'x-cache-hits': '1',
+27 silly registry.get     'x-timer': 'S1430636803.336592,VS0,VE0',
+27 silly registry.get     vary: 'Accept' } ]
+28 silly addNameRange number 2 { name: 'react', range: '*', hasData: true }
+29 silly addNameRange versions [ 'react',
+29 silly addNameRange   [ '0.0.1',
+29 silly addNameRange     '0.0.2',
+29 silly addNameRange     '0.0.3',
+29 silly addNameRange     '0.1.2',
+29 silly addNameRange     '0.2.0',
+29 silly addNameRange     '0.2.1',
+29 silly addNameRange     '0.2.2',
+29 silly addNameRange     '0.2.3',
+29 silly addNameRange     '0.2.4',
+29 silly addNameRange     '0.2.5',
+29 silly addNameRange     '0.2.6',
+29 silly addNameRange     '0.3.0',
+29 silly addNameRange     '0.3.4',
+29 silly addNameRange     '0.3.5',
+29 silly addNameRange     '0.5.0',
+29 silly addNameRange     '0.5.1',
+29 silly addNameRange     '0.5.2',
+29 silly addNameRange     '0.6.0',
+29 silly addNameRange     '0.6.1',
+29 silly addNameRange     '0.6.2',
+29 silly addNameRange     '0.6.3',
+29 silly addNameRange     '0.7.0',
+29 silly addNameRange     '0.7.1',
+29 silly addNameRange     '0.8.0',
+29 silly addNameRange     '0.9.0-rc1',
+29 silly addNameRange     '0.9.0',
+29 silly addNameRange     '0.10.0-rc1',
+29 silly addNameRange     '0.10.0',
+29 silly addNameRange     '0.11.0-rc1',
+29 silly addNameRange     '0.11.0',
+29 silly addNameRange     '0.11.1',
+29 silly addNameRange     '0.11.2',
+29 silly addNameRange     '0.12.0-rc1',
+29 silly addNameRange     '0.12.0',
+29 silly addNameRange     '0.12.1',
+29 silly addNameRange     '0.12.2',
+29 silly addNameRange     '0.13.0-alpha.1',
+29 silly addNameRange     '0.13.0-alpha.2',
+29 silly addNameRange     '0.13.0-beta.1',
+29 silly addNameRange     '0.13.0-beta.2',
+29 silly addNameRange     '0.13.0-rc1',
+29 silly addNameRange     '0.13.0-rc2',
+29 silly addNameRange     '0.13.0',
+29 silly addNameRange     '0.13.1',
+29 silly addNameRange     '0.13.2' ] ]
+30 verbose addNamed [ 'react', '0.13.2' ]
+31 verbose addNamed [ '0.13.2', '0.13.2' ]
+32 silly lockFile f5153930-react-0-13-2 react@0.13.2
+33 verbose lock react@0.13.2 /Users/danielrobinson/.npm/f5153930-react-0-13-2.lock
+34 silly lockFile acf539fe-npmjs-org-react-react-0-13-2-tgz https://registry.npmjs.org/react/-/react-0.13.2.tgz
+35 verbose lock https://registry.npmjs.org/react/-/react-0.13.2.tgz /Users/danielrobinson/.npm/acf539fe-npmjs-org-react-react-0-13-2-tgz.lock
+36 verbose addRemoteTarball [ 'https://registry.npmjs.org/react/-/react-0.13.2.tgz',
+36 verbose addRemoteTarball   'a1c7cec5e7be080c4e249b20740d4d4cd18880ca' ]
+37 info retry fetch attempt 1 at 03:06:43
+38 verbose fetch to= /var/folders/br/05h3k4_x71xdqfgw5lf5_zc00000gn/T/npm-2984-0KFrHZ53/registry.npmjs.org/react/-/react-0.13.2.tgz
+39 http GET https://registry.npmjs.org/react/-/react-0.13.2.tgz
+40 http 200 https://registry.npmjs.org/react/-/react-0.13.2.tgz
+41 silly lockFile acf539fe-npmjs-org-react-react-0-13-2-tgz https://registry.npmjs.org/react/-/react-0.13.2.tgz
+42 silly lockFile acf539fe-npmjs-org-react-react-0-13-2-tgz https://registry.npmjs.org/react/-/react-0.13.2.tgz
+43 silly lockFile f5153930-react-0-13-2 react@0.13.2
+44 silly lockFile f5153930-react-0-13-2 react@0.13.2
+45 silly lockFile 0baa5bb3-react react@
+46 silly lockFile 0baa5bb3-react react@
+47 silly resolved [ { name: 'react',
+47 silly resolved     description: 'React is a JavaScript library for building user interfaces.',
+47 silly resolved     version: '0.13.2',
+47 silly resolved     keywords: [ 'react' ],
+47 silly resolved     homepage: 'https://github.com/facebook/react/tree/master/npm-react',
+47 silly resolved     bugs: { url: 'https://github.com/facebook/react/issues?labels=react-core' },
+47 silly resolved     license: 'BSD-3-Clause',
+47 silly resolved     files: [ 'README.md', 'addons.js', 'react.js', 'dist/', 'lib/' ],
+47 silly resolved     main: 'react.js',
+47 silly resolved     repository: { type: 'git', url: 'https://github.com/facebook/react' },
+47 silly resolved     engines: { node: '>=0.10.0' },
+47 silly resolved     dependencies: { envify: '^3.0.0' },
+47 silly resolved     browserify: { transform: [Object] },
+47 silly resolved     _id: 'react@0.13.2',
+47 silly resolved     _shasum: 'a1c7cec5e7be080c4e249b20740d4d4cd18880ca',
+47 silly resolved     _resolved: 'https://registry.npmjs.org/react/-/react-0.13.2.tgz',
+47 silly resolved     _from: 'react@',
+47 silly resolved     scripts: {},
+47 silly resolved     _npmVersion: '2.7.3',
+47 silly resolved     _nodeVersion: '0.10.38',
+47 silly resolved     _npmUser: { name: 'zpao', email: 'paul@oshannessy.com' },
+47 silly resolved     maintainers: [ [Object], [Object], [Object], [Object] ],
+47 silly resolved     dist:
+47 silly resolved      { shasum: 'a1c7cec5e7be080c4e249b20740d4d4cd18880ca',
+47 silly resolved        tarball: 'http://registry.npmjs.org/react/-/react-0.13.2.tgz' },
+47 silly resolved     directories: {} } ]
+48 info install react@0.13.2 into /usr/local/lib
+49 info installOne react@0.13.2
+50 verbose lib/node_modules/react unbuild
+51 verbose tar unpack /Users/danielrobinson/.npm/react/0.13.2/package.tgz
+52 silly lockFile 5cf5a99a-usr-local-lib-node-modules-react tar:///usr/local/lib/node_modules/react
+53 verbose lock tar:///usr/local/lib/node_modules/react /Users/danielrobinson/.npm/5cf5a99a-usr-local-lib-node-modules-react.lock
+54 silly lockFile 71002254-son-npm-react-0-13-2-package-tgz tar:///Users/danielrobinson/.npm/react/0.13.2/package.tgz
+55 verbose lock tar:///Users/danielrobinson/.npm/react/0.13.2/package.tgz /Users/danielrobinson/.npm/71002254-son-npm-react-0-13-2-package-tgz.lock
+56 silly gunzTarPerm modes [ '755', '644' ]
+57 error Error: EACCES, mkdir '/usr/local/lib/node_modules/react'
+57 error  { [Error: EACCES, mkdir '/usr/local/lib/node_modules/react']
+57 error   errno: 3,
+57 error   code: 'EACCES',
+57 error   path: '/usr/local/lib/node_modules/react',
+57 error   fstream_type: 'Directory',
+57 error   fstream_path: '/usr/local/lib/node_modules/react',
+57 error   fstream_class: 'DirWriter',
+57 error   fstream_stack:
+57 error    [ '/usr/local/lib/node_modules/npm/node_modules/fstream/lib/dir-writer.js:36:23',
+57 error      '/usr/local/lib/node_modules/npm/node_modules/mkdirp/index.js:46:53',
+57 error      'Object.oncomplete (fs.js:107:15)' ] }
+58 error Please try running this command again as root/Administrator.
+59 error System Darwin 14.0.0
+60 error command "node" "/usr/local/bin/npm" "-g" "install" "react"
+61 error cwd /Users/danielrobinson/Desktop/PingBox/chrome/pingbox
+62 error node -v v0.10.32
+63 error npm -v 1.4.28
+64 error path /usr/local/lib/node_modules/react
+65 error fstream_path /usr/local/lib/node_modules/react
+66 error fstream_type Directory
+67 error fstream_class DirWriter
+68 error code EACCES
+69 error errno 3
+70 error stack Error: EACCES, mkdir '/usr/local/lib/node_modules/react'
+71 error fstream_stack /usr/local/lib/node_modules/npm/node_modules/fstream/lib/dir-writer.js:36:23
+71 error fstream_stack /usr/local/lib/node_modules/npm/node_modules/mkdirp/index.js:46:53
+71 error fstream_stack Object.oncomplete (fs.js:107:15)
+72 verbose exit [ 3, true ]

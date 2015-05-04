@@ -1,8 +1,5 @@
-Parse = require('parse').Parse;
-React = require('react');
-
 // set up global Parse app
-pingApp = {};
+var pingApp = pingApp || {};
 
 // set up Parse
 Parse.initialize("8fhsO5d7WTt6c7ffpVrPpHTVvuAi6vArrciyt8cK", "1GHMsEbKTKr7ZhLqcJUPcOJdi7CLD1YZeT4hGuEv");
@@ -73,36 +70,35 @@ var CollectionMixin = {
   }
 };
 
-var PingButton = React.createClass({
+var PingButton = React.createClass({displayName: "PingButton",
   render: function() {
     if (!this.props.task.pinged) {
       return (
-        <button onClick={this.props.handlePing}>Ping</button>
+        React.createElement("button", {onClick: this.props.handlePing}, "Ping")
       )         
     } else {
         return (
-        <span>Pinged</span>
+        React.createElement("span", null, "Pinged")
       )
     }
   }
 });
 
-var AssignTaskRow = React.createClass({
+var AssignTaskRow = React.createClass({displayName: "AssignTaskRow",
   handleAssign: function() {
     // handle assignment
   },
 
   render: function() {
     return (
-      <tr><
-        td>Assign</td>
-        <td><input type="text" /></td>
-      </tr>
+      React.createElement("tr", null, React.createElement("td", null, "Assign"), 
+        React.createElement("td", null, React.createElement("input", {type: "text"}))
+      )
     )
   }
 })
 
-var PingTaskRow = React.createClass({
+var PingTaskRow = React.createClass({displayName: "PingTaskRow",
   handlePing: function(event) {
     this.props.task.ping();
   },
@@ -110,17 +106,17 @@ var PingTaskRow = React.createClass({
   render: function() {
     var task = this.props.task;
     return (
-      <tr>
-        <td>{task.get("score")}</td>
-        <td>{task.get("title")}</td>
-        <td>{task.get("assignee")}</td>
-        <td><PingButton task={task} handlePing={this.handlePing} /></td>
-      </tr>
+      React.createElement("tr", null, 
+        React.createElement("td", null, task.get("score")), 
+        React.createElement("td", null, task.get("title")), 
+        React.createElement("td", null, task.get("assignee")), 
+        React.createElement("td", null, React.createElement(PingButton, {task: task, handlePing: this.handlePing}))
+      )
     )
   }
 });
 
-var PingTopBox = pingApp.PingTopBox = React.createClass({
+var PingTopBox = pingApp.PingTopBox = React.createClass({displayName: "PingTopBox",
   mixins: [CollectionMixin],
 
   getCollections: function () {
@@ -130,54 +126,56 @@ var PingTopBox = pingApp.PingTopBox = React.createClass({
   render: function() {
     // var tasks = this.data.tasks;       
     return (
-      <table>
-        <AssignTaskRow />
-        {
+      React.createElement("table", null, 
+        React.createElement(AssignTaskRow, null), 
+        
           this.props.tasks.map(function(task) {
-            return <PingTaskRow key={task.id} task={task} />
+            return React.createElement(PingTaskRow, {key: task.id, task: task})
           })
-        }
-      </table>
+        
+      )
     )
   }
 });
 
+
+
+
 var gmail;
 
-var main = function() {
-
-  var addPingTopBox = function() {
-    if (gmail.check.is_tabbed_inbox()) {
-      console.log("You are using tabs.");
-      var allInboxes = gmail.dom.inboxes();
-      if (allInboxes.length != 1) {
-        console.log("Too many inboxes!");
-      }
-        // Render Components
-      var PingTopBox = pingApp.PingTopBox;
-
-      var inbox = $(allInboxes[0]);
-      console.log(inbox);
-      inbox.before($("<div id='topBox'></div>"));
-
-      var topBox = pingApp.topBox = React.render(
-        <PingTopBox tasks={pingApp.tasks} />,
-        $("#topBox")[0]
-      );
-    }
-  }
-
-  gmail = new Gmail();
-  console.log('Hello,', gmail.get.user_email());
-  addPingTopBox();
-}
-
-freshen = function(f) {
+function refresh(f) {
   if( (/in/.test(document.readyState)) || (undefined === Gmail) ) {
-    setTimeout('freshen(' + f + ')', 10);
+    setTimeout('refresh(' + f + ')', 10);
   } else {
     f();
   }
 }
 
-freshen(main);
+var addPingTopBox = function() {
+  if (gmail.check.is_tabbed_inbox()) {
+  	console.log("You are using tabs.");
+  	var allInboxes = gmail.dom.inboxes();
+  	if (allInboxes.length != 1) {
+  		console.log("Too many inboxes!");
+  	}
+      // Render Components
+    var PingTopBox = app.PingTopBox;
+
+    var inbox = $(allInboxes[0]);
+    console.log(inbox);
+    inbox.before($("<div>Hey</div>"));
+
+    var topBox = pingApp.topBox = React.render(
+      React.createElement(PingTopBox, {tasks: tasks}),
+      $("#content")[0]
+    );
+  }
+}
+
+var main = function() {
+  gmail = new Gmail();
+  console.log('Hello,', gmail.get.user_email());
+  addPingTopBox();
+}
+
+refresh(main);

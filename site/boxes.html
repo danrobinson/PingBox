@@ -17,39 +17,56 @@
     // set up Parse
     Parse.initialize("8fhsO5d7WTt6c7ffpVrPpHTVvuAi6vArrciyt8cK", "1GHMsEbKTKr7ZhLqcJUPcOJdi7CLD1YZeT4hGuEv");
 
-
     (function() {
     	"use strict";
 
     	// Collections
 
+    	var currentUser = Parse.User.current();
+
+     	var PingClass = Parse.Object.extend("Ping", {});
+	    
+     	var midnight = new Date()
+     	midnight.setHours(0,0,0,0)
+
+	    var PingCollection = Parse.Collection.extend({
+	  		model: PingClass,
+	   		query: new Parse.Query("Ping")
+	   			.equalTo("creator", currentUser)
+	   			.greaterThan("createdAt", midnight),
+			});
+
+			var pings = pingApp.pings = new PingCollection;
+			pings.fetch().then(function(results) {console.log(results);})
+
      	var TaskClass = Parse.Object.extend("Task", {
      		ping: function() {
+     			// this.ping();
+     			this.pinged = true;
+     			this.increment("score");
+     			var thisTask = this;
      			Parse.Cloud.run('ping', {taskID: this.id}, {
      				success: function(result) {
-     					
-     				}
-     				error: function(error) {
-
+     					// update object
+     					pings.add(result.ping);
+     					thisTask.set(result.task.attributes);
+     				},
+     				error: function(result) {
+							// reverse changes
+							this.set(result.task.attributes);
      				}
      			});
      		}
      	});
+
 	    var TaskCollection = Parse.Collection.extend({
 	  		model: TaskClass,
 	   		query: new Parse.Query("Task")
 			});
 
-     	var PingClass = Parse.Object.extend("Ping", {});
-	    var PingCollection = Parse.Collection.extend({
-	  		model: PingClass,
-	   		query: new Parse.Query("Task")
-			});
-
-			var tasks = new TaskCollection;
+			var tasks = pingApp.tasks = new TaskCollection;
 			tasks.on('add remove change sync', function(collection) {console.log("Task Event: ", collection)})
 			tasks.fetch();
-			var pings = new PingCollection;
 
 			// Components
 
@@ -83,6 +100,21 @@
 	    	}
 	    });
 
+	    var AssignTaskRow = React.createClass({
+	    	handleAssign: function() {
+	    		// handle assignment
+	    	},
+
+	    	render: function() {
+	    		return (
+	    			<tr><
+	    				td>Assign</td>
+	    				<td><input type="text" /></td>
+	    			</tr>
+	    		)
+	    	}
+	    })
+
 	    var PingTaskRow = React.createClass({
 				handlePing: function(event) {
 					this.props.task.ping();
@@ -96,7 +128,7 @@
 							<td>{task.get("title")}</td>
 							<td>{task.get("assignee")}</td>
 							<td><PingButton task={task} handlePing={this.handlePing} /></td>
-						</tr>	
+						</tr>
 					)
 				}
 	    });
@@ -112,6 +144,7 @@
 					// var tasks = this.data.tasks;				
 					return (
 						<table>
+							<AssignTaskRow />
 							{
 								this.props.tasks.map(function(task) {
 									return <PingTaskRow key={task.id} task={task} />
@@ -124,75 +157,12 @@
 
 			// Render Components
 
-			var topBox = React.render(
+			var topBox = pingApp.topBox = React.render(
 	  		<PingTopBox tasks={tasks} />,
 	  		$("#content")[0]
 			);
 
-	    // Add Variables To App Namespace
-			pingApp.topBox = topBox;
-			pingApp.tasks = tasks;
-			pingApp.pings = pings;
-
 		})();
-
-   	/*
-
-   	var user = new Parse.User();
-		user.set("username", "danrobinson010");
-		user.set("password", "ping12345");
-		user.set("email", "dev.pingbox@gmail.com");
-
-		user.signUp(null, {
-		  success: function(user) {
-		    // Hooray! Let them use the app now.
-		  },
-		  error: function(user, error) {
-		    // Show the error message somewhere and let the user try again.
-		    alert("Error: " + error.code + " " + error.message);
-		  }
-		});
-
-		
-
-   	query.find({
-   		success: function(tasks) {
-   			
-
-   			Parse.Object.destroyAll(tasks).then(function() {
-				 // ACL to restrict write to user, and public read access
-				var custom_acl = new Parse.ACL();
-				custom_acl.setPublicReadAccess(true);
-				custom_acl.setPublicWriteAccess(true); 
-		    var tasks = [
-		    	new Task({
-		    		title: "Build Outlook extension",
-		    		assignee: "Chris",
-		    		score: 3,
-		    		pinged: false,
-		    	}),
-		    	new Task({
-		    		title: "Build web interface",
-		    		assignee: "Dan",
-		    		score: 3,
-		    		pinged: false,
-		    	}),
-		    	new Task({
-		    		title: "Build backend",
-		    		assignee: "Nathan",
-		    		score: 2,
-		    		pinged: false,
-		    	}),    	
-		    ];
-
-		    for (i=0; i<tasks.length; i++) {
-		    	tasks[i].set("pinged", false);
-		    	tasks[i].save()
-		    }
-		  }
-   	});
-
-		*/
 
     </script>
   </body>

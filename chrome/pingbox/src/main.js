@@ -1,8 +1,5 @@
-Parse = require('parse').Parse;
-React = require('react');
-
 // set up global Parse app
-pingApp = {};
+var pingApp = pingApp || {};
 
 // set up Parse
 Parse.initialize("8fhsO5d7WTt6c7ffpVrPpHTVvuAi6vArrciyt8cK", "1GHMsEbKTKr7ZhLqcJUPcOJdi7CLD1YZeT4hGuEv");
@@ -142,42 +139,44 @@ var PingTopBox = pingApp.PingTopBox = React.createClass({
   }
 });
 
+
+
+
 var gmail;
 
-var main = function() {
-
-  var addPingTopBox = function() {
-    if (gmail.check.is_tabbed_inbox()) {
-      console.log("You are using tabs.");
-      var allInboxes = gmail.dom.inboxes();
-      if (allInboxes.length != 1) {
-        console.log("Too many inboxes!");
-      }
-        // Render Components
-      var PingTopBox = pingApp.PingTopBox;
-
-      var inbox = $(allInboxes[0]);
-      console.log(inbox);
-      inbox.before($("<div id='topBox'></div>"));
-
-      var topBox = pingApp.topBox = React.render(
-        <PingTopBox tasks={pingApp.tasks} />,
-        $("#topBox")[0]
-      );
-    }
-  }
-
-  gmail = new Gmail();
-  console.log('Hello,', gmail.get.user_email());
-  addPingTopBox();
-}
-
-freshen = function(f) {
+function refresh(f) {
   if( (/in/.test(document.readyState)) || (undefined === Gmail) ) {
-    setTimeout('freshen(' + f + ')', 10);
+    setTimeout('refresh(' + f + ')', 10);
   } else {
     f();
   }
 }
 
-freshen(main);
+var addPingTopBox = function() {
+  if (gmail.check.is_tabbed_inbox()) {
+  	console.log("You are using tabs.");
+  	var allInboxes = gmail.dom.inboxes();
+  	if (allInboxes.length != 1) {
+  		console.log("Too many inboxes!");
+  	}
+      // Render Components
+    var PingTopBox = app.PingTopBox;
+
+    var inbox = $(allInboxes[0]);
+    console.log(inbox);
+    inbox.before($("<div>Hey</div>"));
+
+    var topBox = pingApp.topBox = React.render(
+      <PingTopBox tasks={tasks} />,
+      $("#content")[0]
+    );
+  }
+}
+
+var main = function() {
+  gmail = new Gmail();
+  console.log('Hello,', gmail.get.user_email());
+  addPingTopBox();
+}
+
+refresh(main);
